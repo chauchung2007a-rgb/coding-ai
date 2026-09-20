@@ -1,4 +1,28 @@
 export default async function handler(req, res) {
+
+  // Limit: 5 requests per minute
+  if (!globalThis.chatRateLimit) {
+    globalThis.chatRateLimit = {
+      count: 0,
+      resetAt: Date.now() + 60 * 1000
+    };
+  }
+
+  const rateLimit = globalThis.chatRateLimit;
+
+  if (Date.now() > rateLimit.resetAt) {
+    rateLimit.count = 0;
+    rateLimit.resetAt = Date.now() + 60 * 1000;
+  }
+
+  if (rateLimit.count >= 5) {
+    return res.status(429).json({
+      error: "សូមរង់ចាំ 1 នាទី មុនពេលផ្ញើសារបន្ថែម។"
+    });
+  }
+
+  rateLimit.count++;
+  
   // Only allow POST
   if (req.method !== "POST") {
     return res.status(405).json({

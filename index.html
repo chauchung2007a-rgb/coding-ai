@@ -153,37 +153,65 @@
     </div>
   </div>
 
-  <script>
-    function sendMessage() {
-      const input = document.getElementById("messageInput");
-      const chat = document.getElementById("chat");
+<script>
+  async function sendMessage() {
+    const input = document.getElementById("messageInput");
+    const chat = document.getElementById("chat");
 
-      const message = input.value.trim();
+    const message = input.value.trim();
 
-      if (!message) return;
+    if (!message) return;
 
-      const welcome = document.querySelector(".welcome");
-      if (welcome) {
-        welcome.remove();
+    const welcome = document.querySelector(".welcome");
+    if (welcome) {
+      welcome.remove();
+    }
+
+    // បង្ហាញសំណួររបស់អ្នក
+    const userMessage = document.createElement("div");
+    userMessage.className = "message user";
+    userMessage.textContent = message;
+    chat.appendChild(userMessage);
+
+    // បង្ហាញកំពុងគិត
+    const aiMessage = document.createElement("div");
+    aiMessage.className = "message ai";
+    aiMessage.textContent = "⏳ Coding AI កំពុងគិត...";
+    chat.appendChild(aiMessage);
+
+    input.value = "";
+    chat.scrollTop = chat.scrollHeight;
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: message
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "មានបញ្ហាក្នុងការភ្ជាប់ AI");
       }
 
-      const userMessage = document.createElement("div");
-      userMessage.className = "message user";
-      userMessage.textContent = message;
+      aiMessage.textContent = data.reply || "AI មិនបានផ្ញើចម្លើយមកទេ។";
 
-      chat.appendChild(userMessage);
+    } catch (error) {
+      console.error(error);
 
-      const aiMessage = document.createElement("div");
-      aiMessage.className = "message ai";
       aiMessage.textContent =
-        "ខ្ញុំទទួលបានសំណួររបស់អ្នកហើយ។ AI Model នឹងត្រូវភ្ជាប់នៅជំហានបន្ទាប់។";
-
-      chat.appendChild(aiMessage);
-
-      input.value = "";
-      chat.scrollTop = chat.scrollHeight;
+        "❌ មានបញ្ហា៖ " + error.message;
     }
-  </script>
+
+    chat.scrollTop = chat.scrollHeight;
+  }
+</script>
+  
 
 </body>
 </html>

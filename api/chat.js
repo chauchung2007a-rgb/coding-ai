@@ -1,6 +1,13 @@
 export default async function handler(req, res) {
 
-  // Limit: 5 requests per minute
+  // Only allow POST
+  if (req.method !== "POST") {
+    return res.status(405).json({
+      error: "Method not allowed"
+    });
+  }
+
+  // Simple rate limit
   if (!globalThis.chatRateLimit) {
     globalThis.chatRateLimit = {
       count: 0,
@@ -22,61 +29,61 @@ export default async function handler(req, res) {
   }
 
   rateLimit.count++;
-  
-  // Only allow POST
-  if (req.method !== "POST") {
-    return res.status(405).json({
-      error: "Method not allowed"
-    });
-  }
 
   try {
-    // Make sure request body exists
-    const body = req.body || {};
-    const message = typeof body.message === "string"
-      ? body.message.trim()
-      : "";
 
-    // Check message
+    const body = req.body || {};
+
+    const message =
+      typeof body.message === "string"
+        ? body.message.trim()
+        : "";
+
     if (!message) {
       return res.status(400).json({
         error: "Message is required"
       });
     }
 
-    // Check API key exists
-    if (!process.env.OPENAI_API_KEY) {
+    // Check OpenRouter API key
+    if (!process.env.OPENROUTER_API_KEY) {
       return res.status(500).json({
-        error: "OPENAI_API_KEY is not configured in Vercel."
+        error: "OPENROUTER_API_KEY is not configured in Vercel."
       });
     }
 
-    // Send request to OpenAI
-    const openaiResponse = await fetch(
-      "https://api.openai.com/v1/responses",
+    // Send request to OpenRouter
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
       {
         method: "POST",
 
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "HTTP-Referer": "https://coding-ai-six.vercel.app",
+          "X-Title": "Coding AI"
         },
 
         body: JSON.stringify({
-          model: "gpt-4.1-mini",
+          model: "inclusionai/ling-3.0-flash-vl:free",
 
-          instructions:
-            "You are a helpful personal coding AI. Help the user write, debug, explain, improve, and understand code. Answer clearly and provide code when useful.",
-
-          input: message
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are a helpful personal coding AI. Help the user write, debug, explain, improve, and understand code. Answer clearly and provide code when useful."
+            },
+            {
+              role: "user",
+              content: message
+            }
+          ]
         })
       }
     );
 
-    // Read response as text first
-    // This prevents JSON parsing errors if the server
-    // returns something unexpected.
-    const responseText = await openaiResponse.text();
+    const responseText = await response.text();
 
     let data;
 
@@ -84,31 +91,30 @@ export default async function handler(req, res) {
       data = JSON.parse(responseText);
     } catch {
       return res.status(502).json({
-        error: "OpenAI returned an invalid response."
+        error: "OpenRouter returned an invalid response."
       });
     }
 
-    // OpenAI returned an error
-    if (!openaiResponse.ok) {
-      return res.status(openaiResponse.status).json({
+    // OpenRouter error
+    if (!response.ok) {
+      return res.status(response.status).json({
         error:
           data?.error?.message ||
-          "OpenAI API error."
+          "OpenRouter API error."
       });
     }
 
-    // Get AI response text
     const reply =
-      data?.output_text ||
+      data?.choices?.[0]?.message?.content ||
       "AI មិនបានផ្ញើចម្លើយមកទេ។";
 
-    // Send clean JSON back to frontend
     return res.status(200).json({
       reply: reply
     });
 
   } catch (error) {
-    console.error("API error:", error);
+
+    console.error("OpenRouter API error:", error);
 
     return res.status(500).json({
       error:

@@ -3,294 +3,870 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Coding AI</title>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
 
+    html,
     body {
       margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
+      background: #f7f7f8;
       color: #222;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
     }
+
+
+    /* =========================
+       HEADER
+    ========================= */
 
     header {
       height: 58px;
       background: #111;
       color: white;
+
       display: flex;
       align-items: center;
-      padding: 0 16px;
-      font-size: 20px;
-      font-weight: bold;
-    }
 
-    main {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-    }
+      padding: 0 12px;
 
-    .welcome {
-      max-width: 700px;
-      margin: 40px auto;
-      text-align: center;
-    }
-
-    .welcome h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    .welcome p {
-      color: #666;
-      line-height: 1.6;
-    }
-
-    .message {
-      max-width: 800px;
-      margin: 12px auto;
-      padding: 14px;
-      border-radius: 12px;
-      line-height: 1.6;
-      white-space: pre-wrap;
-    }
-
-    .user {
-      background: #e8f0fe;
-    }
-
-    .ai {
-      background: white;
-      border: 1px solid #ddd;
-    }
-
-    .input-area {
-      background: white;
-      border-top: 1px solid #ddd;
-      padding: 10px 12px;
-    }
-
-    .input-box {
-      max-width: 800px;
-      margin: auto;
-      position: relative;
-      display: flex;
-      align-items: flex-end;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 52px;
-      max-height: 160px;
-      resize: none;
-      border: 1px solid #ccc;
-      border-radius: 28px;
-      padding: 14px 58px 14px 16px;
-      font-size: 16px;
-      outline: none;
-      background: #f8f8f8;
-      line-height: 1.4;
-    }
-
-    textarea:focus {
-      border-color: #999;
-      background: white;
-    }
-
-    button {
-      position: absolute;
-      right: 7px;
-      bottom: 7px;
-      width: 38px;
-      height: 38px;
-      border: none;
-      border-radius: 50%;
-      background: #111;
-      color: white;
       font-size: 18px;
-      cursor: pointer;
+      font-weight: 600;
+
+      position: relative;
+      z-index: 20;
+    }
+
+
+    .menu-button,
+    .more-button {
+      width: 40px;
+      height: 40px;
+
+      border: none;
+      background: transparent;
+      color: white;
+
+      border-radius: 10px;
+
+      font-size: 23px;
+
       display: flex;
       align-items: center;
       justify-content: center;
+
+      cursor: pointer;
     }
 
-    button:active {
-      opacity: 0.7;
-      transform: scale(0.95);
+
+    .menu-button:active,
+    .more-button:active {
+      background: rgba(255,255,255,0.12);
     }
+
+
+    .header-title {
+      flex: 1;
+      padding-left: 5px;
+    }
+
+
+    /* =========================
+       MAIN CHAT
+    ========================= */
+
+    main {
+      position: absolute;
+
+      top: 58px;
+      left: 0;
+      right: 0;
+      bottom: 70px;
+
+      overflow-y: auto;
+
+      padding: 16px 12px 20px;
+    }
+
+
+    .welcome {
+      max-width: 650px;
+
+      margin: 80px auto 0;
+
+      text-align: center;
+    }
+
+
+    .welcome h1 {
+      font-size: 28px;
+      margin: 0 0 10px;
+      font-weight: 600;
+    }
+
+
+    .welcome p {
+      color: #777;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+
+    /* =========================
+       MESSAGES
+    ========================= */
+
+    .message {
+      max-width: 800px;
+
+      margin: 12px auto;
+
+      padding: 12px 14px;
+
+      border-radius: 16px;
+
+      line-height: 1.6;
+
+      white-space: pre-wrap;
+
+      word-wrap: break-word;
+    }
+
+
+    .message.user {
+      background: #e8f0fe;
+    }
+
+
+    .message.ai {
+      background: white;
+
+      border: 1px solid #e1e1e1;
+    }
+
+
+    /* =========================
+       INPUT AREA
+    ========================= */
+
+    .input-area {
+      position: fixed;
+
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      background: rgba(247,247,248,0.96);
+
+      padding: 7px 10px 10px;
+
+      z-index: 15;
+    }
+
+
+    .input-box {
+      max-width: 800px;
+
+      margin: 0 auto;
+
+      position: relative;
+
+      display: flex;
+      align-items: center;
+    }
+
+
+    textarea {
+      width: 100%;
+
+      height: 48px;
+      min-height: 48px;
+      max-height: 120px;
+
+      resize: none;
+
+      border: 1px solid #d1d1d1;
+
+      border-radius: 24px;
+
+      outline: none;
+
+      background: white;
+
+      padding: 13px 82px 12px 46px;
+
+      font-size: 16px;
+
+      line-height: 1.4;
+
+      overflow-y: auto;
+    }
+
+
+    textarea:focus {
+      border-color: #999;
+    }
+
+
+    /* =========================
+       PLUS BUTTON
+    ========================= */
+
+    .plus-button {
+      position: absolute;
+
+      left: 7px;
+      top: 7px;
+
+      width: 34px;
+      height: 34px;
+
+      border: none;
+
+      border-radius: 50%;
+
+      background: transparent;
+
+      color: #555;
+
+      font-size: 25px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      cursor: pointer;
+
+      z-index: 2;
+    }
+
+
+    .plus-button:active {
+      background: #eee;
+    }
+
+
+    /* =========================
+       SEND BUTTON
+    ========================= */
+
+    .send-button {
+      position: absolute;
+
+      right: 7px;
+      top: 7px;
+
+      width: 34px;
+      height: 34px;
+
+      border: none;
+
+      border-radius: 50%;
+
+      background: #111;
+
+      color: white;
+
+      font-size: 17px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      cursor: pointer;
+    }
+
+
+    .send-button:active {
+      transform: scale(0.94);
+      opacity: 0.7;
+    }
+
+
+    .send-button:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+
+    /* =========================
+       SIDE MENU
+    ========================= */
+
+    .menu-overlay {
+      position: fixed;
+
+      inset: 0;
+
+      background: rgba(0,0,0,0.35);
+
+      opacity: 0;
+      visibility: hidden;
+
+      transition: 0.25s;
+
+      z-index: 30;
+    }
+
+
+    .menu-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+
+    .side-menu {
+      position: absolute;
+
+      top: 0;
+      left: 0;
+
+      width: min(290px, 82vw);
+      height: 100%;
+
+      background: white;
+
+      box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+
+      transform: translateX(-100%);
+
+      transition: transform 0.25s ease;
+
+      display: flex;
+      flex-direction: column;
+    }
+
+
+    .menu-overlay.open .side-menu {
+      transform: translateX(0);
+    }
+
+
+    .menu-header {
+      height: 58px;
+
+      display: flex;
+      align-items: center;
+
+      padding: 0 12px;
+
+      border-bottom: 1px solid #eee;
+
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+
+    .menu-close {
+      width: 40px;
+      height: 40px;
+
+      border: none;
+
+      background: transparent;
+
+      font-size: 23px;
+
+      border-radius: 10px;
+
+      margin-right: 5px;
+
+      cursor: pointer;
+    }
+
+
+    .menu-close:active {
+      background: #f0f0f0;
+    }
+
+
+    .menu-content {
+      padding: 12px;
+    }
+
+
+    .menu-item {
+      width: 100%;
+
+      min-height: 48px;
+
+      border: none;
+
+      background: transparent;
+
+      border-radius: 10px;
+
+      display: flex;
+      align-items: center;
+
+      padding: 0 12px;
+
+      font-size: 16px;
+
+      text-align: left;
+
+      cursor: pointer;
+    }
+
+
+    .menu-item:active {
+      background: #f0f0f0;
+    }
+
+
+    .menu-item span {
+      margin-left: 10px;
+    }
+
+
+    /* =========================
+       MOBILE
+    ========================= */
 
     @media (max-width: 600px) {
+
       header {
-        font-size: 18px;
+        height: 56px;
       }
 
       main {
-        padding: 10px;
+        top: 56px;
+        bottom: 68px;
+
+        padding-left: 10px;
+        padding-right: 10px;
       }
 
       .welcome {
-        margin: 30px auto;
+        margin-top: 70px;
+      }
+
+      .welcome h1 {
+        font-size: 25px;
       }
 
       .input-area {
-        padding: 8px 10px;
+        padding: 6px 8px 9px;
       }
 
       textarea {
-        min-height: 50px;
+        height: 46px;
+        min-height: 46px;
+
+        padding-top: 12px;
+
         font-size: 16px;
       }
+
+      .plus-button,
+      .send-button {
+        top: 6px;
+      }
     }
+
   </style>
 </head>
 
+
 <body>
 
+
+  <!-- =========================
+       HEADER
+  ========================== -->
+
   <header>
-    💻 Coding AI
+
+    <button
+      class="menu-button"
+      id="menuButton"
+      aria-label="Menu"
+    >
+      ☰
+    </button>
+
+    <div class="header-title">
+      Coding AI
+    </div>
+
+    <button
+      class="more-button"
+      aria-label="More"
+    >
+      ⋯
+    </button>
+
   </header>
 
+
+
+  <!-- =========================
+       CHAT
+  ========================== -->
+
   <main id="chat">
+
     <div class="welcome">
-      <h1>💻 Coding AI</h1>
+
+      <h1>How can I help?</h1>
+
       <p>
-        សួស្តី! ខ្ញុំជា Coding AI របស់អ្នក។<br>
-        ខ្ញុំនឹងផ្តោតលើការសរសេរ កែ និងពន្យល់កូដ។
+        សរសេរកូដ កែ Code ឬពន្យល់ Code
       </p>
+
     </div>
+
   </main>
 
+
+
+  <!-- =========================
+       INPUT
+  ========================== -->
+
   <div class="input-area">
+
     <div class="input-box">
+
+      <button
+        class="plus-button"
+        id="plusButton"
+        type="button"
+        aria-label="Add"
+      >
+        ＋
+      </button>
+
 
       <textarea
         id="messageInput"
-        placeholder="សរសេរសំណួរ ឬបញ្ចូល Code..."
+        placeholder="Message Coding AI..."
       ></textarea>
 
-      <button id="sendButton" onclick="sendMessage()">➤</button>
+
+      <button
+        class="send-button"
+        id="sendButton"
+        type="button"
+        onclick="sendMessage()"
+        aria-label="Send"
+      >
+        ➤
+      </button>
 
     </div>
+
   </div>
+
+
+
+  <!-- =========================
+       SIDE MENU
+  ========================== -->
+
+  <div
+    class="menu-overlay"
+    id="menuOverlay"
+  >
+
+    <div
+      class="side-menu"
+      id="sideMenu"
+    >
+
+      <div class="menu-header">
+
+        <button
+          class="menu-close"
+          id="menuClose"
+          type="button"
+        >
+          ×
+        </button>
+
+        <span>Coding AI</span>
+
+      </div>
+
+
+      <div class="menu-content">
+
+        <button class="menu-item" type="button">
+          ＋
+          <span>New Chat</span>
+        </button>
+
+
+        <button class="menu-item" type="button">
+          💬
+          <span>Chats</span>
+        </button>
+
+
+        <button class="menu-item" type="button">
+          📁
+          <span>Projects</span>
+        </button>
+
+
+        <button class="menu-item" type="button">
+          🧠
+          <span>Memory</span>
+        </button>
+
+
+        <button class="menu-item" type="button">
+          ⚙
+          <span>Settings</span>
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
 
 <script>
 
-  const messageInput = document.getElementById("messageInput");
-  const sendButton = document.getElementById("sendButton");
 
-  messageInput.addEventListener("keydown", function(event) {
+  /* =========================
+     ELEMENTS
+  ========================== */
 
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      sendMessage();
+  const messageInput =
+    document.getElementById("messageInput");
+
+  const sendButton =
+    document.getElementById("sendButton");
+
+  const chat =
+    document.getElementById("chat");
+
+  const menuButton =
+    document.getElementById("menuButton");
+
+  const menuClose =
+    document.getElementById("menuClose");
+
+  const menuOverlay =
+    document.getElementById("menuOverlay");
+
+
+  /* =========================
+     MENU
+  ========================== */
+
+  menuButton.addEventListener("click", function() {
+
+    menuOverlay.classList.add("open");
+
+  });
+
+
+  menuClose.addEventListener("click", function() {
+
+    menuOverlay.classList.remove("open");
+
+  });
+
+
+  menuOverlay.addEventListener("click", function(event) {
+
+    if (event.target === menuOverlay) {
+
+      menuOverlay.classList.remove("open");
+
     }
 
   });
 
 
+  /* =========================
+     TEXTAREA
+  ========================== */
+
+  messageInput.addEventListener(
+    "input",
+    function() {
+
+      this.style.height = "48px";
+
+      this.style.height =
+        Math.min(this.scrollHeight, 120) + "px";
+
+    }
+  );
+
+
+  messageInput.addEventListener(
+    "keydown",
+    function(event) {
+
+      if (
+        event.key === "Enter" &&
+        !event.shiftKey
+      ) {
+
+        event.preventDefault();
+
+        sendMessage();
+
+      }
+
+    }
+  );
+
+
+  /* =========================
+     SEND MESSAGE
+  ========================== */
+
   async function sendMessage() {
 
-    const input = document.getElementById("messageInput");
-    const chat = document.getElementById("chat");
+    const message =
+      messageInput.value.trim();
 
-    const message = input.value.trim();
 
     if (!message) return;
 
 
-    const welcome = document.querySelector(".welcome");
+    const welcome =
+      document.querySelector(".welcome");
+
 
     if (welcome) {
+
       welcome.remove();
+
     }
 
 
-    // User message
-    const userMessage = document.createElement("div");
+    /* User message */
 
-    userMessage.className = "message user";
-    userMessage.textContent = message;
+    const userMessage =
+      document.createElement("div");
+
+    userMessage.className =
+      "message user";
+
+    userMessage.textContent =
+      message;
 
     chat.appendChild(userMessage);
 
 
-    // AI loading message
-    const aiMessage = document.createElement("div");
+    /* AI loading */
 
-    aiMessage.className = "message ai";
-    aiMessage.textContent = "⏳ Coding AI កំពុងគិត...";
+    const aiMessage =
+      document.createElement("div");
+
+    aiMessage.className =
+      "message ai";
+
+    aiMessage.textContent =
+      "⏳ Coding AI កំពុងគិត...";
 
     chat.appendChild(aiMessage);
 
 
-    input.value = "";
+    messageInput.value = "";
 
-    chat.scrollTop = chat.scrollHeight;
+    messageInput.style.height = "48px";
 
 
-    // Disable send button while waiting
+    chat.scrollTop =
+      chat.scrollHeight;
+
+
     sendButton.disabled = true;
 
 
     try {
 
-      const response = await fetch("/api/chat", {
+      /*
+        រក្សា API route ដើម
+        មិនប្តូរទៅ URL ផ្សេងទេ
+      */
 
-        method: "POST",
+      const response =
+        await fetch("/api/chat", {
 
-        headers: {
-          "Content-Type": "application/json"
-        },
+          method: "POST",
 
-        body: JSON.stringify({
-          message: message
-        })
+          headers: {
+            "Content-Type": "application/json"
+          },
 
-      });
+          body: JSON.stringify({
+            message: message
+          })
+
+        });
 
 
       let data;
 
+
       try {
-        data = await response.json();
+
+        data =
+          await response.json();
+
       } catch {
-        throw new Error("Server មិនបានផ្ញើទិន្នន័យត្រឹមត្រូវ។");
+
+        throw new Error(
+          "Server មិនបានផ្ញើទិន្នន័យត្រឹមត្រូវ។"
+        );
+
       }
 
 
       if (!response.ok) {
 
         throw new Error(
-          data.error || "មានបញ្ហាក្នុងការភ្ជាប់ AI"
+          data.error ||
+          "មានបញ្ហាក្នុងការភ្ជាប់ AI"
         );
 
       }
 
 
       aiMessage.textContent =
-        data.reply || "AI មិនបានផ្ញើចម្លើយមកទេ។";
+        data.reply ||
+        "AI មិនបានផ្ញើចម្លើយមកទេ។";
 
 
     } catch (error) {
 
-      console.error("Chat error:", error);
+      console.error(
+        "Chat error:",
+        error
+      );
+
 
       aiMessage.textContent =
-        "❌ មានបញ្ហា៖ " + error.message;
+        "❌ មានបញ្ហា៖ " +
+        error.message;
 
     }
 
 
     sendButton.disabled = false;
 
-    chat.scrollTop = chat.scrollHeight;
+
+    chat.scrollTop =
+      chat.scrollHeight;
 
   }
 

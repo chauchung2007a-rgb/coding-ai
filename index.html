@@ -636,9 +636,7 @@
   </div>
 
 
-
 <script>
-
 
   /* =========================
      ELEMENTS
@@ -662,12 +660,16 @@
   const menuOverlay =
     document.getElementById("menuOverlay");
 
-    /* =========================
+
+  /* =========================
      CHAT HISTORY STORAGE
   ========================== */
 
-  const CHAT_STORAGE_KEY = "codingAI_chats";
-  const CURRENT_CHAT_KEY = "codingAI_currentChat";
+  const CHAT_STORAGE_KEY =
+    "codingAI_chats";
+
+  const CURRENT_CHAT_KEY =
+    "codingAI_currentChat";
 
 
   function getChats() {
@@ -675,7 +677,9 @@
     try {
 
       const data =
-        localStorage.getItem(CHAT_STORAGE_KEY);
+        localStorage.getItem(
+          CHAT_STORAGE_KEY
+        );
 
       if (!data) return [];
 
@@ -811,6 +815,7 @@
 
   }
 
+
   /* =========================
      CHAT SESSION MANAGEMENT
   ========================== */
@@ -818,91 +823,253 @@
   function createNewChat() {
 
     const newChat = {
+
       id: generateChatId(),
+
       title: "New Chat",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+
+      createdAt:
+        new Date().toISOString(),
+
+      updatedAt:
+        new Date().toISOString(),
+
       messages: []
+
     };
 
-    const chats = getChats();
+
+    const chats =
+      getChats();
+
 
     chats.unshift(newChat);
 
+
     saveChats(chats);
 
-    setCurrentChatId(newChat.id);
+
+    setCurrentChatId(
+      newChat.id
+    );
+
 
     return newChat;
-  }
-  
-  function addMessageToCurrentChat(role, text) {
 
-    let currentChat = getCurrentChat();
+  }
+
+
+  /* =========================
+     SAVE MESSAGE
+  ========================== */
+
+  function addMessageToCurrentChat(
+    role,
+    text
+  ) {
+
+    let currentChat =
+      getCurrentChat();
+
 
     if (!currentChat) {
-      currentChat = createNewChat();
+
+      currentChat =
+        createNewChat();
+
     }
 
-    const chats = getChats();
 
-    const chatIndex = chats.findIndex(
-      chatItem => chatItem.id === currentChat.id
-    );
+    const chats =
+      getChats();
+
+
+    const chatIndex =
+      chats.findIndex(
+        chatItem =>
+          chatItem.id ===
+          currentChat.id
+      );
+
 
     if (chatIndex === -1) return;
 
+
     chats[chatIndex].messages.push({
+
       role: role,
+
       text: text,
-      timestamp: new Date().toISOString()
+
+      timestamp:
+        new Date().toISOString()
+
     });
+
 
     chats[chatIndex].updatedAt =
       new Date().toISOString();
 
+
     if (
       role === "user" &&
-      chats[chatIndex].title === "New Chat"
+      chats[chatIndex].title ===
+        "New Chat"
     ) {
+
       chats[chatIndex].title =
         text.length > 40
           ? text.slice(0, 40) + "..."
           : text;
+
     }
+
 
     saveChats(chats);
 
-    setCurrentChatId(chats[chatIndex].id);
+
+    setCurrentChatId(
+      chats[chatIndex].id
+    );
+
   }
-  
+
+
+  /* =========================
+     RENDER SAVED MESSAGES
+  ========================== */
+
+  function renderMessages(
+    messages
+  ) {
+
+    chat.innerHTML = "";
+
+
+    if (
+      !messages ||
+      messages.length === 0
+    ) {
+
+      chat.innerHTML = `
+        <div class="welcome">
+          <h1>How can I help?</h1>
+          <p>សរសេរកូដ កែ Code ឬពន្យល់ Code</p>
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    messages.forEach(
+      function(message) {
+
+        const messageElement =
+          document.createElement(
+            "div"
+          );
+
+
+        messageElement.className =
+          "message " +
+          (
+            message.role === "user"
+              ? "user"
+              : "ai"
+          );
+
+
+        messageElement.textContent =
+          message.text;
+
+
+        chat.appendChild(
+          messageElement
+        );
+
+      }
+    );
+
+
+    chat.scrollTop =
+      chat.scrollHeight;
+
+  }
+
+
+  /* =========================
+     LOAD CURRENT CHAT
+  ========================== */
+
+  function loadCurrentChat() {
+
+    const currentChat =
+      getCurrentChat();
+
+
+    if (!currentChat) {
+
+      renderMessages([]);
+
+      return;
+
+    }
+
+
+    renderMessages(
+      currentChat.messages
+    );
+
+  }
+
+
   /* =========================
      MENU
   ========================== */
 
-  menuButton.addEventListener("click", function() {
+  menuButton.addEventListener(
+    "click",
+    function() {
 
-    menuOverlay.classList.add("open");
-
-  });
-
-
-  menuClose.addEventListener("click", function() {
-
-    menuOverlay.classList.remove("open");
-
-  });
-
-
-  menuOverlay.addEventListener("click", function(event) {
-
-    if (event.target === menuOverlay) {
-
-      menuOverlay.classList.remove("open");
+      menuOverlay.classList.add(
+        "open"
+      );
 
     }
+  );
 
-  });
+
+  menuClose.addEventListener(
+    "click",
+    function() {
+
+      menuOverlay.classList.remove(
+        "open"
+      );
+
+    }
+  );
+
+
+  menuOverlay.addEventListener(
+    "click",
+    function(event) {
+
+      if (
+        event.target ===
+        menuOverlay
+      ) {
+
+        menuOverlay.classList.remove(
+          "open"
+        );
+
+      }
+
+    }
+  );
 
 
   /* =========================
@@ -913,10 +1080,15 @@
     "input",
     function() {
 
-      this.style.height = "48px";
+      this.style.height =
+        "48px";
+
 
       this.style.height =
-        Math.min(this.scrollHeight, 120) + "px";
+        Math.min(
+          this.scrollHeight,
+          120
+        ) + "px";
 
     }
   );
@@ -953,14 +1125,21 @@
 
     if (!message) return;
 
-        // រក្សាទុក User Message
+
+    /* =========================
+       SAVE USER MESSAGE
+    ========================== */
+
     addMessageToCurrentChat(
       "user",
       message
     );
 
+
     const welcome =
-      document.querySelector(".welcome");
+      document.querySelector(
+        ".welcome"
+      );
 
 
     if (welcome) {
@@ -970,44 +1149,66 @@
     }
 
 
-    /* User message */
+    /* =========================
+       USER MESSAGE UI
+    ========================== */
 
     const userMessage =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
+
 
     userMessage.className =
       "message user";
 
+
     userMessage.textContent =
       message;
 
-    chat.appendChild(userMessage);
+
+    chat.appendChild(
+      userMessage
+    );
 
 
-    /* AI loading */
+    /* =========================
+       AI LOADING UI
+    ========================== */
 
     const aiMessage =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
+
 
     aiMessage.className =
       "message ai";
 
+
     aiMessage.textContent =
       "⏳ Coding AI កំពុងគិត...";
 
-    chat.appendChild(aiMessage);
+
+    chat.appendChild(
+      aiMessage
+    );
 
 
-    messageInput.value = "";
+    messageInput.value =
+      "";
 
-    messageInput.style.height = "48px";
+
+    messageInput.style.height =
+      "48px";
 
 
     chat.scrollTop =
       chat.scrollHeight;
 
 
-    sendButton.disabled = true;
+    sendButton.disabled =
+      true;
 
 
     try {
@@ -1018,19 +1219,23 @@
       */
 
       const response =
-        await fetch("/api/chat", {
+        await fetch(
+          "/api/chat",
+          {
 
-          method: "POST",
+            method: "POST",
 
-          headers: {
-            "Content-Type": "application/json"
-          },
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
 
-          body: JSON.stringify({
-            message: message
-          })
+            body: JSON.stringify({
+              message: message
+            })
 
-        });
+          }
+        );
 
 
       let data;
@@ -1060,16 +1265,25 @@
       }
 
 
+      /* =========================
+         SHOW AI RESPONSE
+      ========================== */
+
       aiMessage.textContent =
         data.reply ||
         "AI មិនបានផ្ញើចម្លើយមកទេ។";
 
-      // រក្សាទុក AI Message
+
+      /* =========================
+         SAVE AI MESSAGE
+      ========================== */
+
       addMessageToCurrentChat(
         "ai",
         aiMessage.textContent
       );
-      
+
+
     } catch (error) {
 
       console.error(
@@ -1085,7 +1299,8 @@
     }
 
 
-    sendButton.disabled = false;
+    sendButton.disabled =
+      false;
 
 
     chat.scrollTop =
@@ -1093,7 +1308,12 @@
 
   }
 
-</script>
 
-</body>
-</html>
+  /* =========================
+     STARTUP
+  ========================== */
+
+  loadCurrentChat();
+
+
+</script>

@@ -45,10 +45,10 @@ export default async function handler(req, res) {
       });
     }
 
-    // Check OpenRouter API key
-    if (!process.env.OPENROUTER_API_KEY) {
+    // Check Gemini API key
+    if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({
-        error: "OPENROUTER_API_KEY is not configured in Vercel."
+        error: "GEMINI_API_KEY is not configured in Vercel."
       });
     }
 
@@ -165,37 +165,46 @@ You are Coding AI, a personal multilingual coding assistant.
 - Help the user write, debug, explain, and improve code.
 - Preserve existing functionality unless the user explicitly asks to change it.
 - Before a major change, explain briefly what will change.
-- For major or irreversible actions, ask for the user's approval before performing the action.
 - Do not claim that a change was made unless the change was actually performed.
-- Use the GitHub project context below only as information about the user's project.
+- The user will manually review and save/commit code changes.
+- When asked to modify code, clearly identify which file should be changed.
+- Provide the exact code or exact replacement section needed.
+- Never directly claim that GitHub was modified.
 - Do not expose secrets, API keys, passwords, or access tokens.
+
+### Project Context
+Use the GitHub project context below to understand the user's existing project.
 ${projectContext}
 `;
 
-    // Send request to OpenRouter
+    // Send request to Google Gemini
     const response = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
       {
         method: "POST",
 
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "HTTP-Referer": "https://coding-ai-six.vercel.app",
-          "X-Title": "Coding AI"
+          "x-goog-api-key": process.env.GEMINI_API_KEY
         },
 
         body: JSON.stringify({
-          model: "inclusionai/ling-3.0-flash-vl:free",
+          system_instruction: {
+            parts: [
+              {
+                text: systemPrompt
+              }
+            ]
+          },
 
-          messages: [
-            {
-              role: "system",
-              content: systemPrompt
-            },
+          contents: [
             {
               role: "user",
-              content: message
+              parts: [
+                {
+                  text: message
+                }
+              ]
             }
           ]
         })
@@ -210,21 +219,21 @@ ${projectContext}
       data = JSON.parse(responseText);
     } catch {
       return res.status(502).json({
-        error: "OpenRouter returned an invalid response."
+        error: "Gemini returned an invalid response."
       });
     }
 
-    // OpenRouter error
+    // Gemini API error
     if (!response.ok) {
       return res.status(response.status).json({
         error:
           data?.error?.message ||
-          "OpenRouter API error."
+          "Gemini API error."
       });
     }
 
     const reply =
-      data?.choices?.[0]?.message?.content ||
+      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
       "AI មិនបានផ្ញើចម្លើយមកទេ។";
 
     return res.status(200).json({
@@ -233,7 +242,7 @@ ${projectContext}
 
   } catch (error) {
 
-    console.error("OpenRouter API error:", error);
+    console.error("Gemini API error:", error);
 
     return res.status(500).json({
       error:

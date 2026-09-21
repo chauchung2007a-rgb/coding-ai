@@ -120,8 +120,10 @@ Return a concise plan and an explicit approval request.
           "X-Title": "Coding AI"
         },
         body: JSON.stringify({
+
+
           model:
-  "qwen/qwen3-coder:free",
+  "openrouter/free",
           messages: [
             {
               role: "system",

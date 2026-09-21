@@ -121,7 +121,7 @@ Return a concise plan and an explicit approval request.
         },
         body: JSON.stringify({
           model:
-            "inclusionai/ling-3.0-flash-vl:free",
+  "qwen/qwen3-coder:free",
           messages: [
             {
               role: "system",

@@ -6,6 +6,25 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Protect this write endpoint.
+    const commitSecret = process.env.COMMIT_API_SECRET;
+    const requestSecret = req.headers["x-commit-secret"];
+
+    if (!commitSecret) {
+      return res.status(500).json({
+        error: "COMMIT_API_SECRET is not configured."
+      });
+    }
+
+    if (
+      typeof requestSecret !== "string" ||
+      requestSecret !== commitSecret
+    ) {
+      return res.status(401).json({
+        error: "Unauthorized."
+      });
+    }
+
     const token = process.env.GITHUB_TOKEN;
     const owner = process.env.GITHUB_OWNER;
     const repo = process.env.GITHUB_REPO;
@@ -63,7 +82,6 @@ export default async function handler(req, res) {
     const apiUrl =
       `https://api.github.com/repos/${owner}/${repo}/contents/${cleanPath}`;
 
-    // Get the current file SHA.
     let existingSha = null;
 
     const existingResponse = await fetch(

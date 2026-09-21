@@ -52,6 +52,126 @@ export default async function handler(req, res) {
       });
     }
 
+    // GitHub settings
+    const githubToken = process.env.GITHUB_TOKEN;
+    const githubOwner = process.env.GITHUB_OWNER;
+    const githubRepo = process.env.GITHUB_REPO;
+    const githubBranch = process.env.GITHUB_BRANCH || "main";
+
+    // Detect whether the user is asking about the project/code
+    const projectKeywords = [
+      "project",
+      "code",
+      "coding",
+      "github",
+      "file",
+      "html",
+      "css",
+      "javascript",
+      "chat.js",
+      "index.html",
+      "project.js",
+      "file.js",
+      "កូដ",
+      "គម្រោង",
+      "project របស់ខ្ញុំ",
+      "មើល project",
+      "អាន project",
+      "កែ code"
+    ];
+
+    const wantsProjectContext = projectKeywords.some(keyword =>
+      message.toLowerCase().includes(keyword.toLowerCase())
+    );
+
+    let projectContext = "";
+
+    // Read selected project files only when relevant
+    if (
+      wantsProjectContext &&
+      githubToken &&
+      githubOwner &&
+      githubRepo
+    ) {
+
+      const filesToRead = [
+        "index.html",
+        "api/chat.js",
+        "api/project.js",
+        "api/file.js"
+      ];
+
+      const fileResults = [];
+
+      for (const path of filesToRead) {
+
+        try {
+
+          const response = await fetch(
+            `https://api.github.com/repos/${githubOwner}/${githubRepo}/contents/${path}?ref=${githubBranch}`,
+            {
+              headers: {
+                "Authorization": `Bearer ${githubToken}`,
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28"
+              }
+            }
+          );
+
+          if (!response.ok) {
+            continue;
+          }
+
+          const data = await response.json();
+
+          if (!data.content) {
+            continue;
+          }
+
+          const content = Buffer.from(
+            data.content,
+            "base64"
+          ).toString("utf-8");
+
+          fileResults.push(
+            `\n===== ${path} =====\n${content}`
+          );
+
+        } catch (error) {
+          console.error(`Failed to read ${path}:`, error);
+        }
+      }
+
+      if (fileResults.length > 0) {
+        projectContext =
+          "\n\nPROJECT CONTEXT FROM GITHUB:\n" +
+          fileResults.join("\n");
+      }
+    }
+
+    const systemPrompt = `
+You are Coding AI, a personal multilingual coding assistant.
+
+### Language Rules
+- Understand Khmer, Vietnamese, English, and mixed-language messages.
+- Reply in the same language as the user's latest message unless the user asks for another language.
+- When replying in Khmer, use natural, clear, easy-to-understand Khmer.
+- Keep common programming terms such as HTML, CSS, JavaScript, API, GitHub, Vercel, function, variable, server, frontend, and backend in English when that is clearer.
+- Do not use awkward literal translations.
+- Keep code, filenames, function names, variables, and syntax exactly as code.
+- If the user's request is unclear, ask a short clarification instead of guessing.
+
+### Coding Rules
+- Help the user write, debug, explain, and improve code.
+- Preserve existing functionality unless the user explicitly asks to change it.
+- Before a major change, explain briefly what will change.
+- For major or irreversible actions, ask for the user's approval before performing the action.
+- Do not claim that a change was made unless the change was actually performed.
+- Use the GitHub project context below only as information about the user's project.
+- Do not expose secrets, API keys, passwords, or access tokens.
+${projectContext}
+`;
+
     // Send request to OpenRouter
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
@@ -71,8 +191,7 @@ export default async function handler(req, res) {
           messages: [
             {
               role: "system",
-              content:
-                "You are a helpful personal coding AI. Help the user write, debug, explain, improve, and understand code. Answer clearly and provide code when useful."
+              content: systemPrompt
             },
             {
               role: "user",

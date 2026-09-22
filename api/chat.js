@@ -128,7 +128,7 @@ try {
         !item.path.startsWith(".git/") &&
         !item.path.startsWith("node_modules/")
       )
-      .slice(0, 30);
+     .slice(0, 10);
 
     for (const file of projectFiles) {
       try {
@@ -159,7 +159,7 @@ try {
         ).toString("utf-8");
 
         // Prevent very large files from using too much context
-        const limitedContent = content.slice(0, 50000);
+       const limitedContent = content.slice(0, 12000);
 
         fileResults.push(
           `\n===== ${file.path} =====\n${limitedContent}`

@@ -175,6 +175,13 @@ try {
         // Keep only a small amount of code
         const limitedContent = content.slice(0, 5000);
 
+console.log(
+  "READ PROJECT FILE:",
+  file.path,
+  "CONTENT LENGTH:",
+  content.length
+);
+
         fileResults.push(
           `\n===== ${file.path} =====\n${limitedContent}`
         );

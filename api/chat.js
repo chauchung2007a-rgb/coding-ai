@@ -94,59 +94,89 @@ export default async function handler(req, res) {
       githubRepo
     ) {
 
-      const filesToRead = [
-        "index.html",
-        "api/chat.js",
-        "api/project.js",
-        "api/file.js"
-      ];
+// Read the project structure from GitHub
+const fileResults = [];
 
-      const fileResults = [];
+try {
+  const treeResponse = await fetch(
+    `https://api.github.com/repos/${githubOwner}/${githubRepo}/git/trees/${githubBranch}?recursive=1`,
+    {
+      headers: {
+        "Authorization": `Bearer ${githubToken}`,
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28"
+      }
+    }
+  );
 
-      for (const path of filesToRead) {
+  if (treeResponse.ok) {
+    const treeData = await treeResponse.json();
 
-        try {
+    const projectFiles = (treeData.tree || [])
+      .filter(item =>
+        item.type === "blob" &&
+        !item.path.startsWith(".git/") &&
+        !item.path.startsWith("node_modules/")
+      )
+      .slice(0, 30);
 
-          const response = await fetch(
-            `https://api.github.com/repos/${githubOwner}/${githubRepo}/contents/${path}?ref=${githubBranch}`,
-            {
-              headers: {
-                "Authorization": `Bearer ${githubToken}`,
-                "Accept": "application/vnd.github+json",
-                "X-GitHub-Api-Version": "2022-11-28"
-              }
+    for (const file of projectFiles) {
+      try {
+        const response = await fetch(
+          `https://api.github.com/repos/${githubOwner}/${githubRepo}/contents/${file.path}?ref=${githubBranch}`,
+          {
+            headers: {
+              "Authorization": `Bearer ${githubToken}`,
+              "Accept": "application/vnd.github+json",
+              "X-GitHub-Api-Version": "2022-11-28"
             }
-          );
-
-          if (!response.ok) {
-            continue;
           }
+        );
 
-          const data = await response.json();
-
-          if (!data.content) {
-            continue;
-          }
-
-          const content = Buffer.from(
-            data.content,
-            "base64"
-          ).toString("utf-8");
-
-          fileResults.push(
-            `\n===== ${path} =====\n${content}`
-          );
-
-        } catch (error) {
-          console.error(`Failed to read ${path}:`, error);
+        if (!response.ok) {
+          continue;
         }
-      }
 
-      if (fileResults.length > 0) {
-        projectContext =
-          "\n\nPROJECT CONTEXT FROM GITHUB:\n" +
-          fileResults.join("\n");
+        const data = await response.json();
+
+        if (!data.content) {
+          continue;
+        }
+
+        const content = Buffer.from(
+          data.content,
+          "base64"
+        ).toString("utf-8");
+
+        // Prevent very large files from using too much context
+        const limitedContent = content.slice(0, 50000);
+
+        fileResults.push(
+          `\n===== ${file.path} =====\n${limitedContent}`
+        );
+
+      } catch (error) {
+        console.error(
+          `Failed to read ${file.path}:`,
+          error
+        );
       }
+    }
+  }
+
+} catch (error) {
+  console.error(
+    "Failed to read GitHub project tree:",
+    error
+  );
+}
+
+if (fileResults.length > 0) {
+  projectContext =
+    "\n\nPROJECT FILES FROM GITHUB:\n" +
+    fileResults.join("\n");
+}
+      
     }
 
     const systemPrompt = `

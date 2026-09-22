@@ -184,7 +184,11 @@ if (fileResults.length > 0) {
   projectContext =
     "\n\nPROJECT FILES FROM GITHUB:\n" +
     fileResults.join("\n");
+
+  // Limit total project context size
+  projectContext = projectContext.slice(0, 25000);
 }
+
       
     }
 

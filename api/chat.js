@@ -256,166 +256,74 @@ Use the GitHub project context below to understand the user's existing project.
 ${projectContext}
 `;
 
-      // Send request to Google Gemini with temporary overload retry
-    let response;
+     // Send request to Groq
+const response = await fetch(
+  "https://api.groq.com/openai/v1/chat/completions",
+  {
+    method: "POST",
 
-    const retryDelays = [2000, 4000, 8000];
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
+    },
 
-    for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
-      response = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
+    body: JSON.stringify({
+      model: "openai/gpt-oss-20b",
+
+      messages: [
         {
-          method: "POST",
+          role: "system",
+          content: systemPrompt
+        },
 
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": process.env.GEMINI_API_KEY
-          },
+        ...conversationHistory.map(item => ({
+          role:
+            item.role === "ai"
+              ? "assistant"
+              : "user",
+          content: item.text
+        })),
 
-          body: JSON.stringify({
-            system_instruction: {
-              parts: [
-                {
-                  text: systemPrompt
-                }
-              ]
-            },
-
-            contents: [
-              ...conversationHistory.map(item => ({
-                role:
-                  item.role === "ai"
-                    ? "model"
-                    : "user",
-                parts: [
-                  {
-                    text: item.text
-                  }
-                ]
-              })),
-
-              {
-                role: "user",
-                parts: [
-                  {
-                    text: message
-                  }
-                ]
-              }
-            ]
-          })
-        }
-      );
-
-      // Retry only temporary server overload/errors
-      if (
-        response.ok ||
-        ![500, 502, 503, 504].includes(response.status) ||
-        attempt === retryDelays.length
-      ) {
-        break;
-      }
-
-      await new Promise(resolve =>
-        setTimeout(resolve, retryDelays[attempt])
-      );
-    }
-
-    const responseText = await response.text();
-
-
-
-    let data;
-
-    try {
-      data = JSON.parse(responseText);
-    } catch {
-      return res.status(502).json({
-        error: "Gemini returned an invalid response."
-      });
-    }
-
-       // Fallback to Groq if Gemini fails
-    if (!response.ok) {
-      console.log("Gemini failed. Trying Groq fallback...");
-
-      const groqResponse = await fetch(
-        "https://api.groq.com/openai/v1/chat/completions",
         {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
-          },
-
-          body: JSON.stringify({
-            model: "llama-3.1-8b-instant",
-
-            messages: [
-              {
-                role: "system",
-                content: systemPrompt
-              },
-
-              ...conversationHistory.map(item => ({
-                role:
-                  item.role === "ai"
-                    ? "assistant"
-                    : "user",
-                content: item.text
-              })),
-
-              {
-                role: "user",
-                content: message
-              }
-            ]
-          })
+          role: "user",
+          content: message
         }
-      );
+      ]
+    })
+  }
+);
 
-      const groqText = await groqResponse.text();
+const responseText = await response.text();
 
-      let groqData;
+let data;
 
-      try {
-        groqData = JSON.parse(groqText);
-      } catch {
-        return res.status(502).json({
-          error: "Groq returned an invalid response."
-        });
-      }
+try {
+  data = JSON.parse(responseText);
+} catch {
+  return res.status(502).json({
+    error: "Groq returned an invalid response."
+  });
+}
 
-      if (!groqResponse.ok) {
-        return res.status(groqResponse.status).json({
-          error:
-            groqData?.error?.message ||
-            "Groq API error."
-        });
-      }
+if (!response.ok) {
+  return res.status(response.status).json({
+    error:
+      data?.error?.message ||
+      "Groq API error."
+  });
+}
 
-      const groqReply =
-        groqData?.choices?.[0]?.message?.content ||
-        "AI មិនបានផ្ញើចម្លើយមកទេ។";
+const reply =
+  data?.choices?.[0]?.message?.content ||
+  "AI មិនបានផ្ញើចម្លើយមកទេ។";
 
-      return res.status(200).json({
-        reply: groqReply
-      });
-    }
-
-
-    const reply =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "AI មិនបានផ្ញើចម្លើយមកទេ។";
-
-    return res.status(200).json({
-      reply: reply
-    });
+return res.status(200).json({
+  reply: reply
+});
 
   } catch (error) {
 
-    console.error("Gemini API error:", error);
+    console.error("Groq API error:", error);
 
     return res.status(500).json({
       error:

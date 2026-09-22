@@ -256,53 +256,74 @@ Use the GitHub project context below to understand the user's existing project.
 ${projectContext}
 `;
 
-    // Send request to Google Gemini
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
-      {
-        method: "POST",
+      // Send request to Google Gemini with temporary overload retry
+    let response;
 
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": process.env.GEMINI_API_KEY
-        },
+    const retryDelays = [2000, 4000, 8000];
 
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [
-              {
-                text: systemPrompt
-              }
-            ]
+    for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
+      response = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": process.env.GEMINI_API_KEY
           },
 
-          contents: [
-  ...conversationHistory.map(item => ({
-    role:
-      item.role === "ai"
-        ? "model"
-        : "user",
-    parts: [
-      {
-        text: item.text
-      }
-    ]
-  })),
+          body: JSON.stringify({
+            system_instruction: {
+              parts: [
+                {
+                  text: systemPrompt
+                }
+              ]
+            },
 
-  {
-    role: "user",
-    parts: [
-      {
-        text: message
+            contents: [
+              ...conversationHistory.map(item => ({
+                role:
+                  item.role === "ai"
+                    ? "model"
+                    : "user",
+                parts: [
+                  {
+                    text: item.text
+                  }
+                ]
+              })),
+
+              {
+                role: "user",
+                parts: [
+                  {
+                    text: message
+                  }
+                ]
+              }
+            ]
+          })
+        }
+      );
+
+      // Retry only temporary server overload/errors
+      if (
+        response.ok ||
+        ![500, 502, 503, 504].includes(response.status) ||
+        attempt === retryDelays.length
+      ) {
+        break;
       }
-    ]
-  }
-]
-        })
-      }
-    );
+
+      await new Promise(resolve =>
+        setTimeout(resolve, retryDelays[attempt])
+      );
+    }
 
     const responseText = await response.text();
+
+
 
     let data;
 

@@ -210,7 +210,10 @@ if (projectFileList.length > 0) {
   projectContext = projectContext.slice(0, 12000);
 }
 
-    const systemPrompt = `
+} // Close wantsProjectContext
+
+const systemPrompt = `
+
 You are Coding AI, a personal multilingual coding assistant.
 
 ### LANGUAGE SYSTEM

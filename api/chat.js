@@ -44,8 +44,8 @@ const languagePreference =
     ? body.languagePreference
     : "auto";
 
-   const conversationHistory = Array.isArray(req.body.conversationHistory)
-  ? req.body.conversationHistory.slice(-6)
+  const conversationHistory = Array.isArray(req.body.conversationHistory)
+  ? req.body.conversationHistory.slice(-2)
   : [];
 
     if (!message) {
@@ -105,6 +105,7 @@ const languagePreference =
 
 // Read the project structure from GitHub
 const fileResults = [];
+let projectFileList = [];
 
 try {
   const treeResponse = await fetch(
@@ -121,15 +122,31 @@ try {
   if (treeResponse.ok) {
     const treeData = await treeResponse.json();
 
-    const projectFiles = (treeData.tree || [])
+    const allFiles = (treeData.tree || [])
       .filter(item =>
         item.type === "blob" &&
         !item.path.startsWith(".git/") &&
         !item.path.startsWith("node_modules/")
-      )
-     .slice(0, 10);
+      );
 
-    for (const file of projectFiles) {
+    // Always show the complete file list
+    projectFileList = allFiles.map(file => file.path);
+
+    // Only read a small number of files to save tokens
+    const filesToRead = allFiles
+      .filter(file =>
+        [
+          "index.html",
+          "api/chat.js",
+          "api/project.js",
+          "api/file.js",
+          "api/agent.js",
+          "api/commit.js"
+        ].includes(file.path)
+      )
+      .slice(0, 6);
+
+    for (const file of filesToRead) {
       try {
         const response = await fetch(
           `https://api.github.com/repos/${githubOwner}/${githubRepo}/contents/${file.path}?ref=${githubBranch}`,
@@ -142,23 +159,19 @@ try {
           }
         );
 
-        if (!response.ok) {
-          continue;
-        }
+        if (!response.ok) continue;
 
         const data = await response.json();
 
-        if (!data.content) {
-          continue;
-        }
+        if (!data.content) continue;
 
         const content = Buffer.from(
           data.content,
           "base64"
         ).toString("utf-8");
 
-        // Prevent very large files from using too much context
-       const limitedContent = content.slice(0, 12000);
+        // Keep only a small amount of code
+        const limitedContent = content.slice(0, 5000);
 
         fileResults.push(
           `\n===== ${file.path} =====\n${limitedContent}`
@@ -180,17 +193,20 @@ try {
   );
 }
 
-if (fileResults.length > 0) {
+if (projectFileList.length > 0) {
   projectContext =
-    "\n\nPROJECT FILES FROM GITHUB:\n" +
-    fileResults.join("\n");
+    "\n\nPROJECT FILE LIST:\n" +
+    projectFileList.join("\n");
 
-  // Limit total project context size
- projectContext = projectContext.slice(0, 10000);
+  if (fileResults.length > 0) {
+    projectContext +=
+      "\n\nIMPORTANT PROJECT FILE CONTENT:\n" +
+      fileResults.join("\n");
+  }
+
+  // Final safety limit
+  projectContext = projectContext.slice(0, 12000);
 }
-
-      
-    }
 
     const systemPrompt = `
 You are Coding AI, a personal multilingual coding assistant.
@@ -270,10 +286,12 @@ const response = await fetch(
       "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
     },
 
-    body: JSON.stringify({
-      model: "openai/gpt-oss-20b",
+   body: JSON.stringify({
+  model: "openai/gpt-oss-20b",
 
-      messages: [
+  max_tokens: 1500,
+
+  messages: [
         {
           role: "system",
           content: systemPrompt

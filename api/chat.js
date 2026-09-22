@@ -55,11 +55,13 @@ const languagePreference =
     }
 
     // Check Gemini API key
-    if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({
-        error: "GEMINI_API_KEY is not configured in Vercel."
-      });
-    }
+   
+
+if (!process.env.GROQ_API_KEY) {
+  return res.status(500).json({
+    error: "GROQ_API_KEY is not configured in Vercel."
+  });
+}
 
     // GitHub settings
     const githubToken = process.env.GITHUB_TOKEN;

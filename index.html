@@ -1204,11 +1204,30 @@
       chat.scrollHeight;
 
 
-    sendButton.disabled =
-      true;
+   sendButton.disabled =
+  true;
 
 
-    try {
+/* =========================
+   CONVERSATION CONTEXT
+========================= */
+
+const currentChat =
+  getCurrentChat();
+
+const conversationHistory =
+  currentChat &&
+  Array.isArray(currentChat.messages)
+    ? currentChat.messages
+        .slice(0, -1)
+        .map(item => ({
+          role: item.role,
+          text: item.text
+        }))
+    : [];
+
+
+try {
 
       /*
         រក្សា API route ដើម
@@ -1227,9 +1246,12 @@
                 "application/json"
             },
 
-           body: JSON.stringify({
+          body: JSON.stringify({
   message: message,
-  languagePreference: localStorage.getItem("languagePreference") || "auto"
+  languagePreference:
+    localStorage.getItem("languagePreference") || "auto",
+  conversationHistory:
+    conversationHistory
 })
 
           }

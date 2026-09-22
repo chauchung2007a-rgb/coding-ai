@@ -44,10 +44,9 @@ const languagePreference =
     ? body.languagePreference
     : "auto";
 
-    const conversationHistory =
-  Array.isArray(body.conversationHistory)
-    ? body.conversationHistory
-    : [];
+   const conversationHistory = Array.isArray(req.body.conversationHistory)
+  ? req.body.conversationHistory.slice(-6)
+  : [];
 
     if (!message) {
       return res.status(400).json({

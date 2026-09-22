@@ -186,7 +186,7 @@ if (fileResults.length > 0) {
     fileResults.join("\n");
 
   // Limit total project context size
-  projectContext = projectContext.slice(0, 25000);
+ projectContext = projectContext.slice(0, 10000);
 }
 
       

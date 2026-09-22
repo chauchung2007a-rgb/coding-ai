@@ -44,6 +44,11 @@ const languagePreference =
     ? body.languagePreference
     : "auto";
 
+    const conversationHistory =
+  Array.isArray(body.conversationHistory)
+    ? body.conversationHistory
+    : [];
+
     if (!message) {
       return res.status(400).json({
         error: "Message is required"
@@ -315,15 +320,27 @@ ${projectContext}
           },
 
           contents: [
-            {
-              role: "user",
-              parts: [
-                {
-                  text: message
-                }
-              ]
-            }
-          ]
+  ...conversationHistory.map(item => ({
+    role:
+      item.role === "ai"
+        ? "model"
+        : "user",
+    parts: [
+      {
+        text: item.text
+      }
+    ]
+  })),
+
+  {
+    role: "user",
+    parts: [
+      {
+        text: message
+      }
+    ]
+  }
+]
         })
       }
     );

@@ -277,7 +277,17 @@ The user's goal is to understand the answer easily.
 
 Use the GitHub project context below to understand the user's existing project.
 
+IMPORTANT:
+- When PROJECT FILE LIST is provided, use that list directly.
+- If the user asks for all project files, return the files from PROJECT FILE LIST.
+- Do NOT tell the user to use Git, Node.js, GitHub CLI, Terminal, curl, or another API to get the file list.
+- Do NOT invent another file list.
+- Do NOT redirect the user to /api/agent or /api/project.
+- When answering about the project, use the project context provided below.
+- If the requested information is not present in the project context, say that it was not loaded instead of guessing.
+
 ${projectContext}
+
 `;
 
      // Send request to Groq

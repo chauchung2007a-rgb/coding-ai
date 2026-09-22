@@ -34,10 +34,15 @@ export default async function handler(req, res) {
 
     const body = req.body || {};
 
-    const message =
-      typeof body.message === "string"
-        ? body.message.trim()
-        : "";
+const message =
+  typeof body.message === "string"
+    ? body.message.trim()
+    : "";
+
+const languagePreference =
+  typeof body.languagePreference === "string"
+    ? body.languagePreference
+    : "auto";
 
     if (!message) {
       return res.status(400).json({
@@ -191,11 +196,17 @@ You support these languages:
 
 ### LANGUAGE PRIORITY
 
-1. If the user has selected a specific language in the app, follow that language.
-2. If the setting is "auto", detect the main language of the user's latest message.
-3. If the user clearly switches to another language during the conversation, follow the new language in Auto mode.
-4. If the language is genuinely unclear, ask the user which language they prefer.
-5. Do not switch languages randomly during a conversation.
+The user's current language preference is:
+${languagePreference}
+
+Rules:
+1. If the preference is "km", respond in Khmer.
+2. If the preference is "vi", respond in Vietnamese.
+3. If the preference is "en", respond in English.
+4. If the preference is "auto", detect the main language of the user's latest message.
+5. In "auto" mode, if the user clearly switches language, follow the new language.
+6. Do not switch languages randomly.
+7. If "auto" mode is genuinely unclear, ask which language the user prefers.
 
 ### MIXED LANGUAGE
 

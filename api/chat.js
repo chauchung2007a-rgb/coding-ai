@@ -335,14 +335,75 @@ ${projectContext}
       });
     }
 
-    // Gemini API error
+       // Fallback to Groq if Gemini fails
     if (!response.ok) {
-      return res.status(response.status).json({
-        error:
-          data?.error?.message ||
-          "Gemini API error."
+      console.log("Gemini failed. Trying Groq fallback...");
+
+      const groqResponse = await fetch(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
+          },
+
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+
+            messages: [
+              {
+                role: "system",
+                content: systemPrompt
+              },
+
+              ...conversationHistory.map(item => ({
+                role:
+                  item.role === "ai"
+                    ? "assistant"
+                    : "user",
+                content: item.text
+              })),
+
+              {
+                role: "user",
+                content: message
+              }
+            ]
+          })
+        }
+      );
+
+      const groqText = await groqResponse.text();
+
+      let groqData;
+
+      try {
+        groqData = JSON.parse(groqText);
+      } catch {
+        return res.status(502).json({
+          error: "Groq returned an invalid response."
+        });
+      }
+
+      if (!groqResponse.ok) {
+        return res.status(groqResponse.status).json({
+          error:
+            groqData?.error?.message ||
+            "Groq API error."
+        });
+      }
+
+      const groqReply =
+        groqData?.choices?.[0]?.message?.content ||
+        "AI មិនបានផ្ញើចម្លើយមកទេ។";
+
+      return res.status(200).json({
+        reply: groqReply
       });
     }
+
 
     const reply =
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||

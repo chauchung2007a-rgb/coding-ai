@@ -311,121 +311,142 @@ if (
             ).toString("utf-8");
 
 
-          // =========================================
-          // 9. EXACT CODE SEARCH
-          // =========================================
+         // =========================================
+// 9. EXACT CODE SEARCH
+// =========================================
 
-          if (codeSearchTerm) {
+if (codeSearchTerm) {
 
-            const searchLower =
-              codeSearchTerm.toLowerCase();
+  const searchLower =
+    codeSearchTerm.toLowerCase();
 
-            const contentLower =
-              content.toLowerCase();
+  const contentLower =
+    content.toLowerCase();
 
-            const matches = [];
+  const matches = [];
 
-            let searchStart = 0;
+  let searchStart = 0;
 
+  while (
+    matches.length < 3
+  ) {
 
-            while (
-              matches.length < 3
-            ) {
+    const index =
+      contentLower.indexOf(
+        searchLower,
+        searchStart
+      );
 
-              const index =
-                contentLower.indexOf(
-                  searchLower,
-                  searchStart
-                );
+    if (index === -1) {
+      break;
+    }
 
+    // =====================================
+    // FIND EXACT MATCH LINE
+    // =====================================
 
-              if (index === -1) {
-                break;
-              }
-
-
-              // =====================================
-              // LINE NUMBER
-              // =====================================
-
-              const lineNumber =
-                content
-                  .slice(0, index)
-                  .split("\n")
-                  .length;
+    const matchLine =
+      content
+        .slice(0, index)
+        .split("\n")
+        .length;
 
 
-              // =====================================
-              // SMALL CONTEXT
-              // =====================================
+    // =====================================
+    // CONTEXT AROUND MATCH
+    // =====================================
 
-              const CONTEXT_SIZE = 900;
+    const CONTEXT_SIZE = 900;
 
-              const start =
-                Math.max(
-                  0,
-                  index - CONTEXT_SIZE
-                );
+    const start =
+      Math.max(
+        0,
+        index - CONTEXT_SIZE
+      );
 
-              const end =
-                Math.min(
-                  content.length,
-                  index +
-                    codeSearchTerm.length +
-                    CONTEXT_SIZE
-                );
-
-
-              const snippet =
-                content.slice(
-                  start,
-                  end
-                );
+    const end =
+      Math.min(
+        content.length,
+        index +
+          codeSearchTerm.length +
+          CONTEXT_SIZE
+      );
 
 
-              matches.push(
-                `LINE: ${lineNumber}\n` +
-                snippet
-              );
+    const snippet =
+      content.slice(
+        start,
+        end
+      );
 
 
-              searchStart =
-                index +
-                Math.max(
-                  codeSearchTerm.length,
-                  1
-                );
+    // =====================================
+    // CALCULATE SNIPPET LINE RANGE
+    // =====================================
 
-            }
+    const startLine =
+      content
+        .slice(0, start)
+        .split("\n")
+        .length;
 
-
-            // Only include files where
-            // the search term was actually found.
-
-            if (
-              matches.length > 0
-            ) {
-
-              fileResults.push(
-                `\n===== ${file.path} =====\n` +
-                matches.join(
-                  "\n\n===== NEXT MATCH =====\n\n"
-                )
-              );
-
-            }
+    const endLine =
+      content
+        .slice(0, end)
+        .split("\n")
+        .length;
 
 
-            console.log(
-              "PROJECT SEARCH:",
-              file.path,
-              "SEARCH:",
-              codeSearchTerm,
-              "MATCHES:",
-              matches.length
-            );
+    // =====================================
+    // SAVE EXACT LOCATION
+    // =====================================
 
-          }
+    matches.push(
+      `FILE: ${file.path}\n` +
+      `MATCH: ${codeSearchTerm}\n` +
+      `MATCH LINE: ${matchLine}\n` +
+      `CONTEXT LINES: ${startLine}-${endLine}\n\n` +
+      snippet
+    );
+
+
+    searchStart =
+      index +
+      Math.max(
+        codeSearchTerm.length,
+        1
+      );
+  }
+
+
+  // =====================================
+  // ONLY RETURN FILES WITH MATCHES
+  // =====================================
+
+  if (
+    matches.length > 0
+  ) {
+
+    fileResults.push(
+      "\n===== CODE SEARCH RESULT =====\n" +
+      matches.join(
+        "\n\n===== NEXT MATCH =====\n\n"
+      )
+    );
+
+  }
+
+
+  console.log(
+    "PROJECT SEARCH:",
+    file.path,
+    "SEARCH:",
+    codeSearchTerm,
+    "MATCHES:",
+    matches.length
+  );
+
+}
 
 
           // =========================================

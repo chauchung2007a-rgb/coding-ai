@@ -202,11 +202,13 @@ if (codeSearchTerm) {
 
     if (index === -1) break;
 
-    const start = Math.max(0, index - 1800);
-    const end = Math.min(
-      content.length,
-      index + codeSearchTerm.length + 1800
-    );
+   
+
+const start = Math.max(0, index - 5000);
+const end = Math.min(
+  content.length,
+  index + codeSearchTerm.length + 5000
+);
 
     matches.push(
       content.slice(start, end)

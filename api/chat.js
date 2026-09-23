@@ -98,200 +98,413 @@ if (!process.env.GROQ_API_KEY) {
 
     let projectContext = "";
 
-    // Read selected project files only when relevant
+   // Read project files only when relevant
+if (
+  wantsProjectContext &&
+  githubToken &&
+  githubOwner &&
+  githubRepo
+) {
+
+  const fileResults = [];
+  let projectFileList = [];
+
+  try {
+
+    // =========================================
+    // 1. READ PROJECT TREE
+    // =========================================
+
+    const treeResponse = await fetch(
+      `https://api.github.com/repos/${githubOwner}/${githubRepo}/git/trees/${githubBranch}?recursive=1`,
+      {
+        headers: {
+          "Authorization": `Bearer ${githubToken}`,
+          "Accept": "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28"
+        }
+      }
+    );
+
+    if (!treeResponse.ok) {
+      console.error(
+        "GitHub tree error:",
+        treeResponse.status
+      );
+    } else {
+
+      const treeData =
+        await treeResponse.json();
+
+      const allFiles =
+        (treeData.tree || [])
+          .filter(item =>
+            item.type === "blob" &&
+            !item.path.startsWith(".git/") &&
+            !item.path.startsWith("node_modules/") &&
+            !item.path.startsWith(".next/") &&
+            !item.path.startsWith("dist/") &&
+            !item.path.startsWith("build/")
+          );
+
+      // =========================================
+      // 2. SAVE COMPLETE FILE LIST
+      // =========================================
+
+      projectFileList =
+        allFiles.map(file => file.path);
+
+
+      // =========================================
+      // 3. DETECT CODE SEARCH
+      // =========================================
+
+      const codeSearchMatch =
+        message.match(/`([^`]+)`/);
+
+      const codeSearchTerm =
+        codeSearchMatch
+          ? codeSearchMatch[1]
+              .replace(/$begin:math:text$$end:math:text$$/, "")
+              .trim()
+          : "";
+
+
+      // =========================================
+      // 4. DETECT TARGET FILE
+      // =========================================
+
+      const fileSearchMatch =
+        message.match(
+          /(?:ក្នុង|នៅក្នុង|in|inside)\s+([A-Za-z0-9_./-]+\.(?:html|js|css|json|jsx|ts|tsx|vue|php))/i
+        );
+
+      const targetFile =
+        fileSearchMatch
+          ? fileSearchMatch[1]
+          : "";
+
+
+      // =========================================
+      // 5. FILTER FILES
+      // =========================================
+
+      let filesToSearch = allFiles;
+
+
+      // If user specified a file,
+      // search only that file.
+
+      if (targetFile) {
+
+        filesToSearch =
+          allFiles.filter(
+            file =>
+              file.path === targetFile
+          );
+
+      }
+
+
+      // =========================================
+      // 6. FILE TYPES WE CAN SEARCH
+      // =========================================
+
+      const searchableExtensions = [
+        ".html",
+        ".htm",
+        ".css",
+        ".js",
+        ".jsx",
+        ".ts",
+        ".tsx",
+        ".json",
+        ".vue",
+        ".php",
+        ".py",
+        ".java",
+        ".c",
+        ".cpp",
+        ".cs",
+        ".go",
+        ".rs"
+      ];
+
+
+      filesToSearch =
+        filesToSearch.filter(file => {
+
+          const path =
+            file.path.toLowerCase();
+
+          return searchableExtensions.some(
+            extension =>
+              path.endsWith(extension)
+          );
+
+        });
+
+
+      // =========================================
+      // 7. LIMIT FILE COUNT
+      // =========================================
+
+      // Prevent extremely large projects
+      // from creating too many GitHub requests.
+
+      const MAX_FILES_TO_SEARCH = 40;
+
+      if (
+        filesToSearch.length >
+        MAX_FILES_TO_SEARCH
+      ) {
+
+        filesToSearch =
+          filesToSearch.slice(
+            0,
+            MAX_FILES_TO_SEARCH
+          );
+
+      }
+
+
+      // =========================================
+      // 8. READ FILES
+      // =========================================
+
+      for (const file of filesToSearch) {
+
+        try {
+
+          const response =
+            await fetch(
+              `https://api.github.com/repos/${githubOwner}/${githubRepo}/contents/${file.path}?ref=${githubBranch}`,
+              {
+                headers: {
+                  "Authorization":
+                    `Bearer ${githubToken}`,
+
+                  "Accept":
+                    "application/vnd.github+json",
+
+                  "X-GitHub-Api-Version":
+                    "2022-11-28"
+                }
+              }
+            );
+
+
+          if (!response.ok) {
+            continue;
+          }
+
+
+          const data =
+            await response.json();
+
+
+          if (!data.content) {
+            continue;
+          }
+
+
+          const content =
+            Buffer.from(
+              data.content,
+              "base64"
+            ).toString("utf-8");
+
+
+          let contentForContext = "";
+
+
+          // =========================================
+          // 9. SEARCH CODE
+          // =========================================
+
+          if (codeSearchTerm) {
+
+            const searchLower =
+              codeSearchTerm.toLowerCase();
+
+            const contentLower =
+              content.toLowerCase();
+
+            const matches = [];
+
+            let searchStart = 0;
+
+
+            while (
+              matches.length < 3
+            ) {
+
+              const index =
+                contentLower.indexOf(
+                  searchLower,
+                  searchStart
+                );
+
+
+              if (index === -1) {
+                break;
+              }
+
+
+              // Context around match
+              const CONTEXT_SIZE = 3500;
+
+              const start =
+                Math.max(
+                  0,
+                  index - CONTEXT_SIZE
+                );
+
+
+              const end =
+                Math.min(
+                  content.length,
+                  index +
+                    codeSearchTerm.length +
+                    CONTEXT_SIZE
+                );
+
+
+              matches.push(
+                content.slice(
+                  start,
+                  end
+                )
+              );
+
+
+              searchStart =
+                index +
+                codeSearchTerm.length;
+
+            }
+
+
+            if (
+              matches.length > 0
+            ) {
+
+              contentForContext =
+                matches.join(
+                  "\n\n===== NEXT MATCH =====\n\n"
+                );
+
+            }
+
+          }
+
+
+          // =========================================
+          // 10. NORMAL PROJECT CONTEXT
+          // =========================================
+
+          else {
+
+            // Only load a small portion
+            // when no exact search term exists.
+
+            contentForContext =
+              content.slice(
+                0,
+                5000
+              );
+
+          }
+
+
+          // =========================================
+          // 11. SAVE MATCH
+          // =========================================
+
+          if (contentForContext) {
+
+            fileResults.push(
+              `\n===== ${file.path} =====\n` +
+              contentForContext
+            );
+
+          }
+
+
+          console.log(
+            "PROJECT SEARCH:",
+            file.path,
+            "SEARCH:",
+            codeSearchTerm ||
+              "none",
+            "MATCH:",
+            Boolean(
+              contentForContext
+            )
+          );
+
+
+        } catch (error) {
+
+          console.error(
+            `Failed to read ${file.path}:`,
+            error
+          );
+
+        }
+
+      }
+
+    }
+
+
+  } catch (error) {
+
+    console.error(
+      "Failed to read GitHub project tree:",
+      error
+    );
+
+  }
+
+
+  // =========================================
+  // 12. BUILD PROJECT CONTEXT
+  // =========================================
+
+  if (
+    projectFileList.length > 0
+  ) {
+
+    projectContext =
+      "\n\nPROJECT FILE LIST:\n" +
+      projectFileList.join("\n");
+
+
     if (
-      wantsProjectContext &&
-      githubToken &&
-      githubOwner &&
-      githubRepo
+      fileResults.length > 0
     ) {
 
-// Read the project structure from GitHub
-const fileResults = [];
-let projectFileList = [];
+      projectContext +=
+        "\n\nIMPORTANT PROJECT FILE CONTENT:\n" +
+        fileResults.join("\n");
 
-try {
-  const treeResponse = await fetch(
-    `https://api.github.com/repos/${githubOwner}/${githubRepo}/git/trees/${githubBranch}?recursive=1`,
-    {
-      headers: {
-        "Authorization": `Bearer ${githubToken}`,
-        "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28"
-      }
     }
-  );
 
-  if (treeResponse.ok) {
-    const treeData = await treeResponse.json();
 
-    const allFiles = (treeData.tree || [])
-      .filter(item =>
-        item.type === "blob" &&
-        !item.path.startsWith(".git/") &&
-        !item.path.startsWith("node_modules/")
+    // =========================================
+    // 13. FINAL CONTEXT LIMIT
+    // =========================================
+
+    projectContext =
+      projectContext.slice(
+        0,
+        18000
       );
 
-    // Always show the complete file list
-    projectFileList = allFiles.map(file => file.path);
-
-    // Only read a small number of files to save tokens
-   
-
-const preferredFiles = [
-  "index.html",
-  "api/chat.js",
-  "api/project.js",
-  "api/file.js",
-  "api/agent.js",
-  "api/commit.js"
-];
-
-const filesToRead = preferredFiles
-  .map(path =>
-    allFiles.find(file => file.path === path)
-  )
-  .filter(Boolean);
-
-// Detect a specific code search request
-const codeSearchMatch = message.match(/`([^`]+)`/);
-
-const codeSearchTerm = codeSearchMatch
-  ? codeSearchMatch[1]
-      .replace(/\(\)$/, "")
-      .trim()
-  : "";
-
-const fileSearchMatch = message.match(
-  /(?:ក្នុង|នៅក្នុង|in)\s+([A-Za-z0-9_./-]+\.(?:html|js|css))/i
-);
-
-const targetFile = fileSearchMatch
-  ? fileSearchMatch[1]
-  : "";
-
-   const filesForCodeSearch = targetFile
-  ? filesToRead.filter(file => file.path === targetFile)
-  : filesToRead;
-
-for (const file of filesForCodeSearch) {
-      try {
-        const response = await fetch(
-          `https://api.github.com/repos/${githubOwner}/${githubRepo}/contents/${file.path}?ref=${githubBranch}`,
-          {
-            headers: {
-              "Authorization": `Bearer ${githubToken}`,
-              "Accept": "application/vnd.github+json",
-              "X-GitHub-Api-Version": "2022-11-28"
-            }
-          }
-        );
-
-        if (!response.ok) continue;
-
-        const data = await response.json();
-
-        if (!data.content) continue;
-
-        const content = Buffer.from(
-          data.content,
-          "base64"
-        ).toString("utf-8");
-
-       let contentForContext = "";
-
-if (codeSearchTerm) {
-  const searchLower = codeSearchTerm.toLowerCase();
-  const contentLower = content.toLowerCase();
-
-  const matches = [];
-  let searchStart = 0;
-
-  while (matches.length < 3) {
-    const index = contentLower.indexOf(
-      searchLower,
-      searchStart
-    );
-
-    if (index === -1) break;
-
-   
-
-const start = Math.max(0, index - 5000);
-const end = Math.min(
-  content.length,
-  index + codeSearchTerm.length + 5000
-);
-
-    matches.push(
-      content.slice(start, end)
-    );
-
-    searchStart =
-      index + codeSearchTerm.length;
   }
 
-  if (matches.length > 0) {
-    contentForContext =
-      matches.join(
-        "\n\n===== NEXT MATCH =====\n\n"
-      );
-  }
-} else {
-  // Normal project context
-  contentForContext =
-    content.slice(0, 5000);
 }
-
-console.log(
-  "READ PROJECT FILE:",
-  file.path,
-  "CONTENT LENGTH:",
-  content.length,
-  "SEARCH:",
-  codeSearchTerm || "none",
-  "MATCHED:",
-  Boolean(contentForContext)
-);
-
-if (contentForContext) {
-  fileResults.push(
-    `\n===== ${file.path} =====\n${contentForContext}`
-  );
-}
-
-      } catch (error) {
-        console.error(
-          `Failed to read ${file.path}:`,
-          error
-        );
-      }
-    }
-  }
-
-} catch (error) {
-  console.error(
-    "Failed to read GitHub project tree:",
-    error
-  );
-}
-
-if (projectFileList.length > 0) {
-  projectContext =
-    "\n\nPROJECT FILE LIST:\n" +
-    projectFileList.join("\n");
-
-  if (fileResults.length > 0) {
-    projectContext +=
-      "\n\nIMPORTANT PROJECT FILE CONTENT:\n" +
-      fileResults.join("\n");
-  }
-
-// Final safety limit
-projectContext = projectContext.slice(0, 12000);
-
-} // Close projectFileList
-} // Close wantsProjectContext
 
 const systemPrompt = `
 

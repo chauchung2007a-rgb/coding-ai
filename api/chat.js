@@ -152,6 +152,15 @@ const filesToRead = preferredFiles
   )
   .filter(Boolean);
 
+// Detect a specific code search request
+const codeSearchMatch = message.match(/`([^`]+)`/);
+
+const codeSearchTerm = codeSearchMatch
+  ? codeSearchMatch[1]
+      .replace(/\(\)$/, "")
+      .trim()
+  : "";
+
     for (const file of filesToRead) {
       try {
         const response = await fetch(
@@ -176,19 +185,65 @@ const filesToRead = preferredFiles
           "base64"
         ).toString("utf-8");
 
-        // Keep only a small amount of code
-        const limitedContent = content.slice(0, 5000);
+       let contentForContext = "";
+
+if (codeSearchTerm) {
+  const searchLower = codeSearchTerm.toLowerCase();
+  const contentLower = content.toLowerCase();
+
+  const matches = [];
+  let searchStart = 0;
+
+  while (matches.length < 3) {
+    const index = contentLower.indexOf(
+      searchLower,
+      searchStart
+    );
+
+    if (index === -1) break;
+
+    const start = Math.max(0, index - 1800);
+    const end = Math.min(
+      content.length,
+      index + codeSearchTerm.length + 1800
+    );
+
+    matches.push(
+      content.slice(start, end)
+    );
+
+    searchStart =
+      index + codeSearchTerm.length;
+  }
+
+  if (matches.length > 0) {
+    contentForContext =
+      matches.join(
+        "\n\n===== NEXT MATCH =====\n\n"
+      );
+  }
+} else {
+  // Normal project context
+  contentForContext =
+    content.slice(0, 5000);
+}
 
 console.log(
   "READ PROJECT FILE:",
   file.path,
   "CONTENT LENGTH:",
-  content.length
+  content.length,
+  "SEARCH:",
+  codeSearchTerm || "none",
+  "MATCHED:",
+  Boolean(contentForContext)
 );
 
-        fileResults.push(
-          `\n===== ${file.path} =====\n${limitedContent}`
-        );
+if (contentForContext) {
+  fileResults.push(
+    `\n===== ${file.path} =====\n${contentForContext}`
+  );
+}
 
       } catch (error) {
         console.error(

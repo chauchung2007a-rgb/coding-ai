@@ -135,18 +135,22 @@ try {
     projectFileList = allFiles.map(file => file.path);
 
     // Only read a small number of files to save tokens
-    const filesToRead = allFiles
-      .filter(file =>
-        [
-          "index.html",
-          "api/chat.js",
-          "api/project.js",
-          "api/file.js",
-          "api/agent.js",
-          "api/commit.js"
-        ].includes(file.path)
-      )
-      .slice(0, 6);
+   
+
+const preferredFiles = [
+  "index.html",
+  "api/chat.js",
+  "api/project.js",
+  "api/file.js",
+  "api/agent.js",
+  "api/commit.js"
+];
+
+const filesToRead = preferredFiles
+  .map(path =>
+    allFiles.find(file => file.path === path)
+  )
+  .filter(Boolean);
 
     for (const file of filesToRead) {
       try {

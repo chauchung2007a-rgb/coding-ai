@@ -161,7 +161,19 @@ const codeSearchTerm = codeSearchMatch
       .trim()
   : "";
 
-    for (const file of filesToRead) {
+const fileSearchMatch = message.match(
+  /(?:ក្នុង|នៅក្នុង|in)\s+([A-Za-z0-9_./-]+\.(?:html|js|css))/i
+);
+
+const targetFile = fileSearchMatch
+  ? fileSearchMatch[1]
+  : "";
+
+   const filesForCodeSearch = targetFile
+  ? filesToRead.filter(file => file.path === targetFile)
+  : filesToRead;
+
+for (const file of filesForCodeSearch) {
       try {
         const response = await fetch(
           `https://api.github.com/repos/${githubOwner}/${githubRepo}/contents/${file.path}?ref=${githubBranch}`,

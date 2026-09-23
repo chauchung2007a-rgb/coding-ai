@@ -286,12 +286,9 @@ if (projectFileList.length > 0) {
       fileResults.join("\n");
   }
 
- // Final safety limit
-if (codeSearchTerm) {
-  projectContext = projectContext.slice(0, 30000);
-} else {
-  projectContext = projectContext.slice(0, 12000);
-}
+// Final safety limit
+projectContext = projectContext.slice(0, 12000);
+
 
 } // Close wantsProjectContext
 

@@ -127,10 +127,12 @@ if (
     );
 
     if (!treeResponse.ok) {
+
       console.error(
         "GitHub tree error:",
         treeResponse.status
       );
+
     } else {
 
       const treeData =
@@ -148,7 +150,7 @@ if (
           );
 
       // =========================================
-      // 2. SAVE COMPLETE FILE LIST
+      // 2. COMPLETE PROJECT FILE LIST
       // =========================================
 
       projectFileList =
@@ -176,7 +178,7 @@ if (
 
       const fileSearchMatch =
         message.match(
-          /(?:ក្នុង|នៅក្នុង|in|inside)\s+([A-Za-z0-9_./-]+\.(?:html|js|css|json|jsx|ts|tsx|vue|php))/i
+          /(?:ក្នុង|នៅក្នុង|in|inside)\s+([A-Za-z0-9_./-]+\.(?:html|js|css|json|jsx|ts|tsx|vue|php|py|java|c|cpp|cs|go|rs))/i
         );
 
       const targetFile =
@@ -186,28 +188,7 @@ if (
 
 
       // =========================================
-      // 5. FILTER FILES
-      // =========================================
-
-      let filesToSearch = allFiles;
-
-
-      // If user specified a file,
-      // search only that file.
-
-      if (targetFile) {
-
-        filesToSearch =
-          allFiles.filter(
-            file =>
-              file.path === targetFile
-          );
-
-      }
-
-
-      // =========================================
-      // 6. FILE TYPES WE CAN SEARCH
+      // 5. SEARCHABLE FILE TYPES
       // =========================================
 
       const searchableExtensions = [
@@ -231,8 +212,12 @@ if (
       ];
 
 
-      filesToSearch =
-        filesToSearch.filter(file => {
+      // =========================================
+      // 6. SELECT FILES
+      // =========================================
+
+      let filesToSearch =
+        allFiles.filter(file => {
 
           const path =
             file.path.toLowerCase();
@@ -245,14 +230,25 @@ if (
         });
 
 
+      // If user specified a target file,
+      // search only that file.
+
+      if (targetFile) {
+
+        filesToSearch =
+          filesToSearch.filter(
+            file =>
+              file.path === targetFile
+          );
+
+      }
+
+
       // =========================================
-      // 7. LIMIT FILE COUNT
+      // 7. LIMIT FILES TO SCAN
       // =========================================
 
-      // Prevent extremely large projects
-      // from creating too many GitHub requests.
-
-      const MAX_FILES_TO_SEARCH = 40;
+      const MAX_FILES_TO_SEARCH = 30;
 
       if (
         filesToSearch.length >
@@ -315,11 +311,8 @@ if (
             ).toString("utf-8");
 
 
-          let contentForContext = "";
-
-
           // =========================================
-          // 9. SEARCH CODE
+          // 9. EXACT CODE SEARCH
           // =========================================
 
           if (codeSearchTerm) {
@@ -351,15 +344,28 @@ if (
               }
 
 
-              // Context around match
-              const CONTEXT_SIZE = 3500;
+              // =====================================
+              // LINE NUMBER
+              // =====================================
+
+              const lineNumber =
+                content
+                  .slice(0, index)
+                  .split("\n")
+                  .length;
+
+
+              // =====================================
+              // SMALL CONTEXT
+              // =====================================
+
+              const CONTEXT_SIZE = 900;
 
               const start =
                 Math.max(
                   0,
                   index - CONTEXT_SIZE
                 );
-
 
               const end =
                 Math.min(
@@ -370,31 +376,54 @@ if (
                 );
 
 
-              matches.push(
+              const snippet =
                 content.slice(
                   start,
                   end
-                )
+                );
+
+
+              matches.push(
+                `LINE: ${lineNumber}\n` +
+                snippet
               );
 
 
               searchStart =
                 index +
-                codeSearchTerm.length;
+                Math.max(
+                  codeSearchTerm.length,
+                  1
+                );
 
             }
 
+
+            // Only include files where
+            // the search term was actually found.
 
             if (
               matches.length > 0
             ) {
 
-              contentForContext =
+              fileResults.push(
+                `\n===== ${file.path} =====\n` +
                 matches.join(
                   "\n\n===== NEXT MATCH =====\n\n"
-                );
+                )
+              );
 
             }
+
+
+            console.log(
+              "PROJECT SEARCH:",
+              file.path,
+              "SEARCH:",
+              codeSearchTerm,
+              "MATCHES:",
+              matches.length
+            );
 
           }
 
@@ -405,43 +434,18 @@ if (
 
           else {
 
-            // Only load a small portion
-            // when no exact search term exists.
+            // Only load a small preview
+            // when there is no exact search.
 
-            contentForContext =
-              content.slice(
-                0,
-                5000
-              );
-
-          }
-
-
-          // =========================================
-          // 11. SAVE MATCH
-          // =========================================
-
-          if (contentForContext) {
+            const preview =
+              content.slice(0, 1200);
 
             fileResults.push(
               `\n===== ${file.path} =====\n` +
-              contentForContext
+              preview
             );
 
           }
-
-
-          console.log(
-            "PROJECT SEARCH:",
-            file.path,
-            "SEARCH:",
-            codeSearchTerm ||
-              "none",
-            "MATCH:",
-            Boolean(
-              contentForContext
-            )
-          );
 
 
         } catch (error) {
@@ -469,16 +473,28 @@ if (
 
 
   // =========================================
-  // 12. BUILD PROJECT CONTEXT
+  // 11. BUILD SMALL PROJECT CONTEXT
   // =========================================
 
   if (
     projectFileList.length > 0
   ) {
 
+    // Keep the file list small enough
+    // for the AI request.
+
+    const MAX_FILE_LIST_CHARS = 5000;
+
     projectContext =
       "\n\nPROJECT FILE LIST:\n" +
       projectFileList.join("\n");
+
+
+    projectContext =
+      projectContext.slice(
+        0,
+        MAX_FILE_LIST_CHARS
+      );
 
 
     if (
@@ -493,18 +509,21 @@ if (
 
 
     // =========================================
-    // 13. FINAL CONTEXT LIMIT
+    // 12. FINAL TOKEN-SAFE LIMIT
     // =========================================
+
+    const MAX_PROJECT_CONTEXT_CHARS = 9000;
 
     projectContext =
       projectContext.slice(
         0,
-        18000
+        MAX_PROJECT_CONTEXT_CHARS
       );
 
   }
 
 }
+
 
 const systemPrompt = `
 

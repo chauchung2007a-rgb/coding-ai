@@ -290,7 +290,7 @@ if (projectFileList.length > 0) {
 // Final safety limit
 projectContext = projectContext.slice(0, 12000);
 
-
+} // Close projectFileList
 } // Close wantsProjectContext
 
 const systemPrompt = `

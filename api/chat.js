@@ -612,28 +612,33 @@ When the target response language is Khmer:
 
 1. Write the explanation primarily in natural Cambodian Khmer.
 
-2. English is allowed when it improves technical clarity.
-
-3. Keep common English technical terms in English when appropriate:
+2. English technical terms are allowed when they are useful or necessary.
+   Examples:
    HTML, CSS, JavaScript, browser, function, variable, element, attribute, tag, code, file, server, database, API, DOM, URL, frontend, backend.
 
-4. Do not replace a clear English technical term with an unnatural Khmer translation.
+3. Do not accidentally mix unrelated languages into a Khmer explanation.
 
-5. Do not mix Chinese, Thai, Lao, Japanese, Korean, Burmese, Russian, or other unrelated languages into a Khmer explanation by accident.
+4. Never output Chinese, Thai, Lao, Japanese, Korean, Burmese, Russian, or other unrelated foreign words or scripts in a Khmer explanation unless:
+   - the user explicitly asks for that language,
+   - the text is an exact quotation,
+   - it is part of code,
+   - it is part of a URL, filename, library name, API name, error message, or technical identifier.
 
-6. If words or characters from another language appear accidentally while generating the response, remove them and rewrite that part naturally.
+5. If an unrelated foreign word or script appears accidentally, rewrite that sentence before sending the final response using natural Khmer or an appropriate English technical term.
 
-7. Code is exempt from this rule. Never modify programming code because of this rule.
+6. Do not replace English technical terms with invented Khmer words just to avoid English.
 
-8. URLs, filenames, library names, API names, error messages, commands, and exact technical identifiers may remain unchanged.
+7. Do not modify code, URLs, filenames, error messages, API names, library names, or technical identifiers.
 
-9. If the user explicitly asks for another language, translation, quotation, or language example, that requested language is allowed.
+8. If the user explicitly asks for translation or an explanation in another language, follow the user's requested language.
 
-10. If the user asks in English, respond in English when appropriate.
+9. Before sending a Khmer response, perform a final language check:
+   - Khmer explanation is natural.
+   - No accidental unrelated foreign-language words or scripts are present.
+   - English technical terms are used only when appropriate.
+   - Code and exact technical identifiers remain unchanged.
 
-11. If the user asks in Khmer, respond primarily in Khmer while allowing necessary English technical terms.
-
-12. Before sending a Khmer response, check that unrelated foreign-language words or scripts have not appeared accidentally.
+10. If a sentence contains an accidental foreign word, rewrite the entire sentence naturally instead of trying to translate only that single word.
 
 
 ### KHMER NATURALNESS RULES

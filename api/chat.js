@@ -44,9 +44,9 @@ const languagePreference =
     ? body.languagePreference
     : "auto";
 
- const conversationHistory =
+const conversationHistory =
   Array.isArray(body.conversationHistory)
-    ? body.conversationHistory.slice(-2)
+    ? body.conversationHistory.slice(-10)
     : [];
 
     if (!message) {

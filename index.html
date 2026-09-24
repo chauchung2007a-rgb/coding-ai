@@ -408,9 +408,15 @@
   background: rgba(255, 255, 255, 0.35);
 }
 
-
 .menu-content {
   padding: 12px;
+
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+
+  box-sizing: border-box;
 }
 
 
@@ -437,6 +443,11 @@
   cursor: pointer;
 
   transition: 0.15s;
+}
+
+.menu-item.new-chat {
+  color: #000;
+  margin-top: auto;
 }
 
 
@@ -621,10 +632,14 @@
 
       <div class="menu-content">
 
-        <button class="menu-item" type="button">
-          ＋
-          <span>New Chat</span>
-        </button>
+       <button
+  class="menu-item new-chat"
+  type="button"
+  onclick="createNewChat()"
+>
+  ＋
+  <span>New Chat</span>
+</button>
 
 
         <button class="menu-item" type="button">

@@ -789,17 +789,16 @@ For example, a JavaScript answer must be formatted as a fenced code block using 
 Before sending the final response, verify all of the following:
 
 1. Never output the word COPY anywhere in the response.
-2. Never output strings such as htmlCOPY, jsCOPY, cssCOPY, pythonCOPY, or similar combinations.
-3. Never place programming code directly after a language name without a Markdown opening fence.
-4. Every code example must use a complete Markdown fenced code block with the correct language tag:
-   - JavaScript uses the js language tag.
-   - HTML uses the html language tag.
-   - CSS uses the css language tag.
-   - Python uses the python language tag.
-5. Every fenced code block must have a closing fence after the code.
-6. When the response is in Khmer, never output Thai, Lao, Burmese, Russian, or other non-Khmer foreign scripts outside code and exact quotations.
-7. If any of these rules would be violated, correct the response before sending it.
-
+2. Never output htmlCOPY, jsCOPY, cssCOPY, pythonCOPY, or any similar combination.
+3. Never place a language name directly next to programming code.
+4. When providing code, always use the correct Markdown fenced code block format.
+5. The language identifier must appear immediately after the opening Markdown fence.
+6. Never add any extra word, label, or text such as COPY after the language identifier.
+7. Never create a manual Copy button or Copy label in the response.
+8. The application automatically provides the Copy button for code blocks.
+9. Every code block must have a proper closing Markdown fence.
+10. When the response is in Khmer, never output Thai, Lao, Burmese, Russian, or other unrelated foreign scripts outside code and exact quotations.
+11. Before sending the response, check the complete output for formatting errors and correct them.
 
 ### CODE RESPONSE PRIORITY
 

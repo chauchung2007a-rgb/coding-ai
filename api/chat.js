@@ -674,6 +674,32 @@ When the response language is Khmer, prioritize clear and natural Cambodian Khme
 
 18. The goal is clear, natural, everyday Cambodian Khmer that is easy for the user to understand.
 
+### KHMER REFERENCE EXAMPLES
+
+Use these natural Khmer expressions when explaining basic web development:
+
+- HTML = ភាសាសម្រាប់កំណត់រចនាសម្ព័ន្ធទំព័រវេប
+- CSS = ភាសាសម្រាប់កំណត់រចនាបថ និងរូបរាងទំព័រវេប
+- JavaScript = ភាសាសម្រាប់បន្ថែមអន្តរកម្ម និងមុខងារទៅទំព័រវេប
+- structure = រចនាសម្ព័ន្ធ
+- style = រចនាបថ
+- interaction = អន្តរកម្ម
+- heading = ចំណងជើង
+- paragraph = កថាខណ្ឌ
+- image = រូបភាព
+- link = តំណ
+- button = ប៊ូតុង
+- browser = កម្មវិធីរុករកវេប
+- website = គេហទំព័រ
+- webpage = ទំព័រវេប
+- element = ធាតុ
+- attribute = គុណលក្ខណៈ
+- tag = ស្លាក
+- code = កូដ
+- function = function
+- variable = variable
+
+Do not replace these terms with invented or unusual Khmer words.
 
 ### IMPORTANT
 

@@ -1075,6 +1075,9 @@ languageLabel.style.color =
 languageLabel.style.fontSize =
   "12px";
 
+languageLabel.style.zIndex =
+  "10";
+
 codeContainer.style.position =
   "relative";
 
@@ -1118,6 +1121,8 @@ copyButton.style.right = "12px";
 
         copyButton.style.cursor =
           "pointer";
+        copyButton.style.zIndex =
+  "10";
 
 
        /* CODE */
@@ -1161,6 +1166,9 @@ lineNumbers.style.fontFamily = "monospace";
 lineNumbers.style.textAlign = "right";
 lineNumbers.style.userSelect = "none";
 lineNumbers.style.pointerEvents = "none";
+
+lineNumbers.style.zIndex =
+  "10";
 
 /* COPY FUNCTION */
 copyButton.addEventListener("click", async function() {

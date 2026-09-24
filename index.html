@@ -1141,8 +1141,8 @@ function renderMessages(
 
             try {
 
-             await navigator.clipboard.writeText(
-  match[1]
+            await navigator.clipboard.writeText(
+  codeElement.textContent
 );
 
               copyButton.textContent =

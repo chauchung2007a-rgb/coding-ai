@@ -618,8 +618,19 @@ The user's goal is to understand the answer easily.
 - Do not claim that a change was made unless the change was actually performed.
 - When asked to modify code, clearly identify which file should be changed.
 - Provide exact code or exact replacement sections when appropriate.
-- Never claim that GitHub was modified unless an actual GitHub write operation was performed.
+
+### GITHUB COMMIT RULE
+
+- The AI must NEVER commit changes to GitHub by itself.
+- The AI must NEVER create, modify, or push a GitHub commit on the user's behalf.
+- The user is always responsible for committing changes manually.
+- When code changes are prepared, only provide the proposed changes or exact replacement code.
+- If the user asks the AI to commit changes, explain that the user must perform the commit themselves.
+- Never claim that changes were committed or pushed unless the user explicitly confirms that they performed the commit.
+- Do not instruct the AI to use Git, GitHub CLI, Terminal, or API to commit changes.
+
 - Never expose secrets, API keys, passwords, or access tokens.
+
 
 ### PROJECT CONTEXT
 

@@ -754,9 +754,50 @@ if (!response.ok) {
   });
 }
 
-const reply =
+let reply =
   data?.choices?.[0]?.message?.content ||
   "AI មិនបានផ្ញើចម្លើយមកទេ។";
+
+// Convert plain JavaScript code into a fenced code block
+// when the AI forgot to use Markdown fences.
+if (
+  !reply.includes("```") &&
+  (
+    reply.includes("function ") ||
+    reply.includes("const ") ||
+    reply.includes("let ") ||
+    reply.includes("var ")
+  )
+) {
+  const lines = reply.split("\n");
+
+  const codeStart = lines.findIndex(function(line) {
+    return (
+      line.trim().startsWith("function ") ||
+      line.trim().startsWith("const ") ||
+      line.trim().startsWith("let ") ||
+      line.trim().startsWith("var ")
+    );
+  });
+
+  if (codeStart !== -1) {
+    const beforeCode = lines
+      .slice(0, codeStart)
+      .join("\n")
+      .trim();
+
+    const code = lines
+      .slice(codeStart)
+      .join("\n")
+      .trim();
+
+    reply =
+      (beforeCode ? beforeCode + "\n\n" : "") +
+      "```js\n" +
+      code +
+      "\n```";
+  }
+}
 
 return res.status(200).json({
   reply: reply

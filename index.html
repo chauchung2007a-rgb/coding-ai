@@ -1123,88 +1123,58 @@ languageLabel.style.fontSize =
           "pointer";
 
 
-        /* CODE */
+       /* CODE */
+const codeElement = document.createElement("pre");
 
-        const codeElement =
-          document.createElement(
-            "pre"
-          );
+codeElement.style.margin = "0";
+codeElement.style.padding = "42px 12px 12px 52px";
+codeElement.style.background = "#2b2b2b";
+codeElement.style.color = "#fff";
+codeElement.style.borderRadius = "12px";
+codeElement.style.overflowX = "auto";
+codeElement.style.whiteSpace = "pre";
+codeElement.textContent = match[2];
 
-        codeElement.style.margin =
-          "0";
+/* LINE NUMBERS */
+const lineNumbers = document.createElement("div");
 
-        codeElement.style.padding =
-          "42px 12px 12px";
+const codeLines = match[2].split("\n");
 
-       codeElement.style.background =
-  "#2b2b2b";
+lineNumbers.textContent = codeLines
+  .map(function(_, index) {
+    return index + 1;
+  })
+  .join("\n");
 
-        codeElement.style.color =
-          "#fff";
+lineNumbers.style.position = "absolute";
+lineNumbers.style.top = "42px";
+lineNumbers.style.left = "12px";
+lineNumbers.style.color = "#777";
+lineNumbers.style.fontSize = "14px";
+lineNumbers.style.lineHeight = "normal";
+lineNumbers.style.fontFamily = "monospace";
+lineNumbers.style.textAlign = "right";
+lineNumbers.style.userSelect = "none";
+lineNumbers.style.pointerEvents = "none";
 
-        codeElement.style.borderRadius =
-          "12px";
+/* COPY FUNCTION */
+copyButton.addEventListener("click", async function() {
+  try {
+    await navigator.clipboard.writeText(codeElement.textContent);
+    copyButton.textContent = "✓ Copied";
 
-        codeElement.style.overflowX =
-          "auto";
+    setTimeout(function() {
+      copyButton.textContent = "📋 Copy";
+    }, 1500);
+  } catch (error) {
+    console.error("Copy failed:", error);
+  }
+});
 
-        codeElement.style.whiteSpace =
-          "pre";
-
-
-      codeElement.textContent =
-  match[2];
-
-
-        /* COPY FUNCTION */
-
-        copyButton.addEventListener(
-          "click",
-          async function() {
-
-            try {
-
-            await navigator.clipboard.writeText(
-  codeElement.textContent
-);
-
-              copyButton.textContent =
-                "✓ Copied";
-
-              setTimeout(
-                function() {
-
-                  copyButton.textContent =
-                    "📋 Copy";
-
-                },
-                1500
-              );
-
-            } catch (error) {
-
-              console.error(
-                "Copy failed:",
-                error
-              );
-
-            }
-
-          }
-        );
-
-
-       codeContainer.appendChild(
-  languageLabel
-);
-
-codeContainer.appendChild(
-  copyButton
-);
-
-codeContainer.appendChild(
-  codeElement
-);
+codeContainer.appendChild(languageLabel);
+codeContainer.appendChild(copyButton);
+codeContainer.appendChild(lineNumbers);
+codeContainer.appendChild(codeElement);
 
 
         messageElement.appendChild(

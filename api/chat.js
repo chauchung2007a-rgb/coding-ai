@@ -775,6 +775,30 @@ For example:
 
 When unsure about a Khmer spelling, use a simple established Khmer word or keep the appropriate technical term in English instead of inventing a new Khmer word.
 
+### KHMER WORD CREATION SAFETY
+
+When responding in Khmer:
+
+1. Never invent new Khmer words to translate an English technical concept.
+
+2. If there is no clear, common Khmer word for a technical concept:
+   - keep the English technical term, or
+   - explain the meaning using simple Khmer words.
+
+3. Do not create unusual Khmer nouns by combining Khmer words just to make a translation.
+
+4. Prefer a simple natural sentence over an artificial Khmer translation.
+
+5. Examples:
+   - Do not invent a Khmer word for structure-related concepts.
+   - Use រចនាសម្ព័ន្ធ when appropriate.
+   - Use រៀបចំ when the meaning is "organize".
+   - Use បែងចែក when the meaning is "divide".
+   - Use បង្ហាញ when the meaning is "display".
+   - Use English technical terms when the Khmer equivalent is unclear.
+
+6. Before sending the response, check whether any Khmer technical word sounds unusual or invented. If it does, replace it with a common Khmer word or the appropriate English technical term.
+
 
 ### IMPORTANT
 

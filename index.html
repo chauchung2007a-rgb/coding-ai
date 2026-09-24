@@ -1517,19 +1517,26 @@ try {
          SHOW AI RESPONSE
       ========================== */
 
-      aiMessage.textContent =
-        data.reply ||
-        "AI មិនបានផ្ញើចម្លើយមកទេ។";
+     const aiReply =
+  data.reply ||
+  "AI មិនបានផ្ញើចម្លើយមកទេ។";
+
+aiMessage.textContent =
+  aiReply;
 
 
       /* =========================
          SAVE AI MESSAGE
       ========================== */
 
-      addMessageToCurrentChat(
-        "ai",
-        aiMessage.textContent
-      );
+   addMessageToCurrentChat(
+  "ai",
+  aiReply
+);
+
+renderMessages(
+  getCurrentChat().messages
+);
 
 
     } catch (error) {

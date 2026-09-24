@@ -1010,13 +1010,15 @@ function renderMessages(
          CODE BLOCK
       ========================== */
 
-     const codeBlockRegex =
-  /```(?:[\w+-]+)?\s*([\s\S]*?)```/g;
+   const codeBlockRegex =
+  /```([\w+-]*)\s*([\s\S]*?)```/g;
 
 
       let lastIndex = 0;
 
       let match;
+
+     let language = "";
 
 
       while (
@@ -1051,6 +1053,27 @@ function renderMessages(
           document.createElement(
             "div"
           );
+
+          const languageLabel =
+  document.createElement("div");
+
+languageLabel.textContent =
+  match[1] || "code";
+
+languageLabel.style.position =
+  "absolute";
+
+languageLabel.style.top =
+  "8px";
+
+languageLabel.style.left =
+  "12px";
+
+languageLabel.style.color =
+  "#ccc";
+
+languageLabel.style.fontSize =
+  "12px";
 
         codeContainer.style.position =
           "relative";
@@ -1129,8 +1152,8 @@ function renderMessages(
           "pre";
 
 
-       codeElement.textContent =
-  match[1];
+      codeElement.textContent =
+  match[2];
 
 
         /* COPY FUNCTION */
@@ -1171,13 +1194,17 @@ function renderMessages(
         );
 
 
-        codeContainer.appendChild(
-          copyButton
-        );
+       codeContainer.appendChild(
+  languageLabel
+);
 
-        codeContainer.appendChild(
-          codeElement
-        );
+codeContainer.appendChild(
+  copyButton
+);
+
+codeContainer.appendChild(
+  codeElement
+);
 
 
         messageElement.appendChild(

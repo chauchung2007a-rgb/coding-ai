@@ -856,6 +856,44 @@ When responding in Khmer:
 
 12. Clarity and natural Cambodian Khmer are more important than translating every technical word into Khmer.
 
+### HTML KHMER WORDING REFERENCES
+
+When explaining HTML in Khmer, use these natural terms consistently:
+
+- HTML → HTML
+- HyperText Markup Language → HyperText Markup Language
+- tag → ស្លាក
+- element → ធាតុ
+- attribute → គុណលក្ខណៈ
+- content → ខ្លឹមសារ
+- structure → រចនាសម្ព័ន្ធ
+- webpage → ទំព័រវេប
+- website → គេហទំព័រ
+- heading → ចំណងជើង
+- paragraph → កថាខណ្ឌ
+- image → រូបភាព
+- link → តំណ
+- button → ប៊ូតុង
+- browser → កម្មវិធីរុករកវេប
+- document → ឯកសារ
+- environment → បរិស្ថាន
+- main purpose → គោលបំណងសំខាន់
+- text → អត្ថបទ
+- title → ចំណងជើង
+
+Prefer these natural expressions:
+
+- tag → ស្លាក
+- HTML element → ធាតុ HTML
+- HTML structure → រចនាសម្ព័ន្ធ HTML
+- page content → ខ្លឹមសារនៃទំព័រ
+- main purpose → គោលបំណងសំខាន់
+- HTML document → ឯកសារ HTML
+
+Do not invent alternative Khmer translations for these terms.
+
+When a Khmer translation sounds unnatural, keep the English technical term instead of inventing a new Khmer word.
+
 
 ### IMPORTANT
 

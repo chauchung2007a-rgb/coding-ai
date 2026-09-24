@@ -1152,33 +1152,6 @@ codeElement.style.whiteSpace = "pre";
 
 codeElement.textContent = match[2];
 
-/* LINE NUMBERS */
-const lineNumbers = document.createElement("div");
-
-const codeLines = match[2].split("\n");
-
-lineNumbers.textContent = codeLines
-  .map(function(_, index) {
-    return index + 1;
-  })
-  .join("\n");
-
-lineNumbers.style.position = "absolute";
-lineNumbers.style.top = "42px";
-lineNumbers.style.left = "12px";
-lineNumbers.style.color = "#777";
-lineNumbers.style.fontSize = "14px";
-lineNumbers.style.lineHeight = "normal";
-lineNumbers.style.fontFamily = "monospace";
-lineNumbers.style.textAlign = "right";
-lineNumbers.style.userSelect = "none";
-lineNumbers.style.pointerEvents = "none";
-
-lineNumbers.style.zIndex =
-  "10";
-
-lineNumbers.style.background =
-  "#2b2b2b";
 
 /* COPY FUNCTION */
 copyButton.addEventListener("click", async function() {
@@ -1196,7 +1169,6 @@ copyButton.addEventListener("click", async function() {
 
 codeContainer.appendChild(languageLabel);
 codeContainer.appendChild(copyButton);
-codeContainer.appendChild(lineNumbers);
 codeContainer.appendChild(codeElement);
 
 

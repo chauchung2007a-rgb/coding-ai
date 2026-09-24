@@ -779,25 +779,64 @@ When unsure about a Khmer spelling, use a simple established Khmer word or keep 
 
 When responding in Khmer:
 
-1. Never invent new Khmer words to translate an English technical concept.
+1. Never invent a new Khmer word to translate an English technical term.
 
-2. If there is no clear, common Khmer word for a technical concept:
+2. Always prefer the established Khmer terms already defined in the Khmer reference sections.
+
+3. Use the correct Khmer term according to the meaning and context.
+
+4. If a technical term does not have a clear and natural Khmer equivalent:
    - keep the English technical term, or
    - explain the meaning using simple Khmer words.
+   Never invent a new Khmer translation.
 
-3. Do not create unusual Khmer nouns by combining Khmer words just to make a translation.
+5. Use these established terms consistently:
+   - structure → រចនាសម្ព័ន្ធ
+   - content → ខ្លឹមសារ
+   - element → ធាតុ
+   - tag → ស្លាក
+   - heading → ចំណងជើង
+   - paragraph → កថាខណ្ឌ
+   - button → ប៊ូតុង
+   - image → រូបភាព
+   - link → តំណ
+   - action → សកម្មភាព
+   - display → បង្ហាញ
+   - render → បង្ហាញ ឬ បង្កើតឱ្យបង្ហាញ
+   - interaction → អន្តរកម្ម
+   - layout → ប្លង់
+   - appearance → រូបរាង
+   - browser → កម្មវិធីរុករកវេប
 
-4. Prefer a simple natural sentence over an artificial Khmer translation.
+6. Do not replace an established Khmer term with a different word just to make the sentence sound more varied.
 
-5. Examples:
-   - Do not invent a Khmer word for structure-related concepts.
-   - Use រចនាសម្ព័ន្ធ when appropriate.
-   - Use រៀបចំ when the meaning is "organize".
-   - Use បែងចែក when the meaning is "divide".
-   - Use បង្ហាញ when the meaning is "display".
-   - Use English technical terms when the Khmer equivalent is unclear.
+7. Do not use unrelated Khmer words as translations for technical concepts.
 
-6. Before sending the response, check whether any Khmer technical word sounds unusual or invented. If it does, replace it with a common Khmer word or the appropriate English technical term.
+8. Examples of incorrect wording:
+   - Do not use សំណង់ to mean HTML or structure.
+   - Do not use សញ្ញាកំណត់ to mean tag.
+   - Do not use សំណើលំអិត as a replacement for a technical heading unless that is actually the intended meaning.
+   - Do not use ចំណងជើងមុខម្ដង when simply referring to a heading.
+   - Do not use គេហទំព័រប្រហែល when referring to an external website or link.
+
+9. When explaining HTML:
+   - HTML → HTML
+   - tag → ស្លាក
+   - element → ធាតុ
+   - structure → រចនាសម្ព័ន្ធ
+   - content → ខ្លឹមសារ
+   - webpage → ទំព័រវេប
+   - website → គេហទំព័រ
+
+10. When translating a technical sentence, translate the meaning naturally instead of translating every English word separately.
+
+11. Before sending the final response, check every Khmer technical term:
+   - Is it a common and natural Khmer word?
+   - Is it consistent with the reference terms?
+   - Does it have the correct meaning in this context?
+   - If not, replace it with the established Khmer term or keep the English technical term.
+
+12. Clarity and natural Cambodian Khmer are more important than translating every technical word into Khmer.
 
 
 ### IMPORTANT

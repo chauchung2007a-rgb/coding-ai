@@ -1010,8 +1010,8 @@ function renderMessages(
          CODE BLOCK
       ========================== */
 
-      const codeBlockRegex =
-        /```([\w+-]*)\n?([\s\S]*?)```/g;
+     const codeBlockRegex =
+  /```(?:[\w+-]+)?\s*([\s\S]*?)```/g;
 
 
       let lastIndex = 0;
@@ -1129,8 +1129,8 @@ function renderMessages(
           "pre";
 
 
-        codeElement.textContent =
-          match[2];
+       codeElement.textContent =
+  match[1];
 
 
         /* COPY FUNCTION */
@@ -1141,9 +1141,9 @@ function renderMessages(
 
             try {
 
-              await navigator.clipboard.writeText(
-                match[2]
-              );
+             await navigator.clipboard.writeText(
+  match[1]
+);
 
               copyButton.textContent =
                 "✓ Copied";

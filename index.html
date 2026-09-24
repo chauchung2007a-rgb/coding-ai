@@ -956,68 +956,272 @@
   }
 
 
-  /* =========================
-     RENDER SAVED MESSAGES
-  ========================== */
+ /* =========================
+   RENDER SAVED MESSAGES
+========================= */
 
-  function renderMessages(
-    messages
+function renderMessages(
+  messages
+) {
+
+  chat.innerHTML = "";
+
+
+  if (
+    !messages ||
+    messages.length === 0
   ) {
 
-    chat.innerHTML = "";
+    chat.innerHTML = `
+      <div class="welcome">
+        <h1>How can I help?</h1>
+        <p>សរសេរកូដ កែ Code ឬពន្យល់ Code</p>
+      </div>
+    `;
+
+    return;
+
+  }
 
 
-    if (
-      !messages ||
-      messages.length === 0
-    ) {
+  messages.forEach(
+    function(message) {
 
-      chat.innerHTML = `
-        <div class="welcome">
-          <h1>How can I help?</h1>
-          <p>សរសេរកូដ កែ Code ឬពន្យល់ Code</p>
-        </div>
-      `;
-
-      return;
-
-    }
+      const messageElement =
+        document.createElement(
+          "div"
+        );
 
 
-    messages.forEach(
-      function(message) {
+      messageElement.className =
+        "message " +
+        (
+          message.role === "user"
+            ? "user"
+            : "ai"
+        );
 
-        const messageElement =
+
+      const text =
+        message.text || "";
+
+
+      /* =========================
+         CODE BLOCK
+      ========================== */
+
+      const codeBlockRegex =
+        /```([\w+-]*)\n?([\s\S]*?)```/g;
+
+
+      let lastIndex = 0;
+
+      let match;
+
+
+      while (
+        (match =
+          codeBlockRegex.exec(text))
+        !== null
+      ) {
+
+        /* TEXT BEFORE CODE */
+
+        const beforeText =
+          text.slice(
+            lastIndex,
+            match.index
+          );
+
+
+        if (beforeText) {
+
+          messageElement.appendChild(
+            document.createTextNode(
+              beforeText
+            )
+          );
+
+        }
+
+
+        /* CODE CONTAINER */
+
+        const codeContainer =
           document.createElement(
             "div"
           );
 
+        codeContainer.style.position =
+          "relative";
 
-        messageElement.className =
-          "message " +
-          (
-            message.role === "user"
-              ? "user"
-              : "ai"
+        codeContainer.style.margin =
+          "10px 0";
+
+
+        /* COPY BUTTON */
+
+        const copyButton =
+          document.createElement(
+            "button"
           );
 
+        copyButton.textContent =
+          "📋 Copy";
 
-        messageElement.textContent =
-          message.text;
+        copyButton.style.position =
+          "absolute";
+
+        copyButton.style.top =
+          "8px";
+
+        copyButton.style.right =
+          "8px";
+
+        copyButton.style.border =
+          "none";
+
+        copyButton.style.borderRadius =
+          "8px";
+
+        copyButton.style.padding =
+          "5px 9px";
+
+        copyButton.style.background =
+          "#333";
+
+        copyButton.style.color =
+          "#fff";
+
+        copyButton.style.fontSize =
+          "12px";
+
+        copyButton.style.cursor =
+          "pointer";
 
 
-        chat.appendChild(
-          messageElement
+        /* CODE */
+
+        const codeElement =
+          document.createElement(
+            "pre"
+          );
+
+        codeElement.style.margin =
+          "0";
+
+        codeElement.style.padding =
+          "42px 12px 12px";
+
+        codeElement.style.background =
+          "#1e1e1e";
+
+        codeElement.style.color =
+          "#fff";
+
+        codeElement.style.borderRadius =
+          "12px";
+
+        codeElement.style.overflowX =
+          "auto";
+
+        codeElement.style.whiteSpace =
+          "pre";
+
+
+        codeElement.textContent =
+          match[2];
+
+
+        /* COPY FUNCTION */
+
+        copyButton.addEventListener(
+          "click",
+          async function() {
+
+            try {
+
+              await navigator.clipboard.writeText(
+                match[2]
+              );
+
+              copyButton.textContent =
+                "✓ Copied";
+
+              setTimeout(
+                function() {
+
+                  copyButton.textContent =
+                    "📋 Copy";
+
+                },
+                1500
+              );
+
+            } catch (error) {
+
+              console.error(
+                "Copy failed:",
+                error
+              );
+
+            }
+
+          }
+        );
+
+
+        codeContainer.appendChild(
+          copyButton
+        );
+
+        codeContainer.appendChild(
+          codeElement
+        );
+
+
+        messageElement.appendChild(
+          codeContainer
+        );
+
+
+        lastIndex =
+          codeBlockRegex.lastIndex;
+
+      }
+
+
+      /* TEXT AFTER LAST CODE BLOCK */
+
+      const remainingText =
+        text.slice(
+          lastIndex
+        );
+
+
+      if (remainingText) {
+
+        messageElement.appendChild(
+          document.createTextNode(
+            remainingText
+          )
         );
 
       }
-    );
 
 
-    chat.scrollTop =
-      chat.scrollHeight;
+      chat.appendChild(
+        messageElement
+      );
 
-  }
+    }
+  );
+
+
+  chat.scrollTop =
+    chat.scrollHeight;
+
+}
 
 
   /* =========================

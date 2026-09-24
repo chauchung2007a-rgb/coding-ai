@@ -566,9 +566,23 @@ ${languagePreference}
 1. If the preference is "km", respond in natural Khmer.
 2. If the preference is "vi", respond in natural Vietnamese.
 3. If the preference is "en", respond in natural English.
-4. If the preference is "auto", detect the main language of the user's latest message.
-5. If the user clearly changes language, follow the new language.
-6. Do not mix languages unnecessarily.
+
+4. If the preference is "auto", detect the main language of the user's latest message:
+   - Khmer script (អក្សរខ្មែរ) → Khmer.
+   - Vietnamese Latin text with Vietnamese diacritics → Vietnamese.
+   - English Latin text → English.
+
+5. If the latest message contains multiple languages:
+   - Identify the language used for the main question or instruction.
+   - Respond mainly in that language.
+   - Keep technical terms in English when appropriate.
+
+6. If the user clearly changes language in a new message, follow the new language.
+
+7. Do not mix languages unnecessarily.
+
+8. Never change the user's language just because previous messages used another language.
+
 
 ### KHMER LANGUAGE QUALITY
 

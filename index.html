@@ -1187,24 +1187,13 @@ codeContainer.appendChild(codeElement);
 
      if (remainingText) {
 
-  const formattedText =
-    remainingText.replace(
-      /\*\*(.*?)\*\*/g,
-      "<strong>$1</strong>"
-    );
-
-  const textContainer =
-    document.createElement("span");
-
-  textContainer.innerHTML =
-    formattedText;
-
   messageElement.appendChild(
-    textContainer
+    document.createTextNode(
+      remainingText
+    )
   );
 
 }
-
 
       chat.appendChild(
         messageElement

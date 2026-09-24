@@ -414,7 +414,7 @@
   display: flex;
   flex-direction: column;
 
-  height: 100%;
+  flex: 1;
 
   box-sizing: border-box;
 }
@@ -630,42 +630,42 @@
       </div>
 
 
-      <div class="menu-content">
+     <div class="menu-content">
 
-       <button
-  class="menu-item new-chat"
-  type="button"
-  onclick="createNewChat()"
->
-  ＋
-  <span>New Chat</span>
-</button>
+  <button class="menu-item" type="button">
+    💬
+    <span>Chats</span>
+  </button>
 
 
-        <button class="menu-item" type="button">
-          💬
-          <span>Chats</span>
-        </button>
+  <button class="menu-item" type="button">
+    📁
+    <span>Projects</span>
+  </button>
 
 
-        <button class="menu-item" type="button">
-          📁
-          <span>Projects</span>
-        </button>
+  <button class="menu-item" type="button">
+    🧠
+    <span>Memory</span>
+  </button>
 
 
-        <button class="menu-item" type="button">
-          🧠
-          <span>Memory</span>
-        </button>
+  <button class="menu-item" type="button">
+    ⚙
+    <span>Settings</span>
+  </button>
 
 
-        <button class="menu-item" type="button">
-          ⚙
-          <span>Settings</span>
-        </button>
+  <button
+    class="menu-item new-chat"
+    type="button"
+    onclick="createNewChat()"
+  >
+    ＋
+    <span>New Chat</span>
+  </button>
 
-      </div>
+</div>
 
     </div>
 
@@ -856,43 +856,74 @@
      CHAT SESSION MANAGEMENT
   ========================== */
 
-  function createNewChat() {
+ function createNewChat() {
 
-    const newChat = {
+  const newChat = {
 
-      id: generateChatId(),
+    id: generateChatId(),
 
-      title: "New Chat",
+    title: "New Chat",
 
-      createdAt:
-        new Date().toISOString(),
+    createdAt:
+      new Date().toISOString(),
 
-      updatedAt:
-        new Date().toISOString(),
+    updatedAt:
+      new Date().toISOString(),
 
-      messages: []
+    messages: []
 
-    };
-
-
-    const chats =
-      getChats();
+  };
 
 
-    chats.unshift(newChat);
+  const chats =
+    getChats();
 
 
-    saveChats(chats);
+  chats.unshift(newChat);
 
 
-    setCurrentChatId(
-      newChat.id
-    );
+  saveChats(chats);
 
 
-    return newChat;
+  setCurrentChatId(
+    newChat.id
+  );
 
-  }
+
+  /* =========================
+     SHOW NEW CHAT
+  ========================== */
+
+  renderMessages(
+    newChat.messages
+  );
+
+
+  /* =========================
+     CLOSE MENU
+  ========================== */
+
+  menuOverlay.classList.remove(
+    "open"
+  );
+
+
+  /* =========================
+     RESET INPUT
+  ========================== */
+
+  messageInput.value = "";
+
+  messageInput.style.height =
+    "48px";
+
+
+  messageInput.focus();
+
+
+  return newChat;
+
+}
 
 
   /* =========================

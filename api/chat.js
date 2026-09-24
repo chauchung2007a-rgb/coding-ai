@@ -748,6 +748,33 @@ Do not use unnatural translations such as:
 
 Prefer simple Khmer explanations that clearly communicate the technical meaning.
 
+### KHMER SPELLING AND WORDING REFERENCES
+
+Use the following standard Khmer words exactly when they are appropriate:
+
+- paragraph = កថាខណ្ឌ
+- heading = ចំណងជើង
+- title = ចំណងជើង
+- content = ខ្លឹមសារ
+- structure = រចនាសម្ព័ន្ធ
+- element = ធាតុ
+- tag = ស្លាក
+- button = ប៊ូតុង
+- text = អត្ថបទ
+- image = រូបភាព
+- link = តំណ
+- action = សកម្មភាព
+- function = function
+- browser = កម្មវិធីរុករកវេប
+
+Do not invent alternative spellings or unusual forms of these common Khmer words.
+
+For example:
+- Always use កថាខណ្ឌ, not គថាខណ្ឌ.
+- Prefer ចំណងជើង, not ខ្សែចំណងជើង.
+
+When unsure about a Khmer spelling, use a simple established Khmer word or keep the appropriate technical term in English instead of inventing a new Khmer word.
+
 
 ### IMPORTANT
 

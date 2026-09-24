@@ -1185,21 +1185,25 @@ codeContainer.appendChild(codeElement);
 
       /* TEXT AFTER LAST CODE BLOCK */
 
-      const remainingText =
-        text.slice(
-          lastIndex
-        );
+     if (remainingText) {
 
+  const formattedText =
+    remainingText.replace(
+      /\*\*(.*?)\*\*/g,
+      "<strong>$1</strong>"
+    );
 
-      if (remainingText) {
+  const textContainer =
+    document.createElement("span");
 
-        messageElement.appendChild(
-          document.createTextNode(
-            remainingText
-          )
-        );
+  textContainer.innerHTML =
+    formattedText;
 
-      }
+  messageElement.appendChild(
+    textContainer
+  );
+
+}
 
 
       chat.appendChild(

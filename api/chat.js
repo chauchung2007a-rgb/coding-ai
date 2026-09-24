@@ -713,6 +713,42 @@ Avoid unnatural expressions such as:
 
 Do not replace these terms with invented or unusual Khmer words.
 
+### KHMER TECHNICAL PHRASE REFERENCES
+
+Use these natural expressions when explaining web development:
+
+- render → បង្ហាញ ឬ បង្កើតឱ្យបង្ហាញ
+- display → បង្ហាញ
+- line break → ការចុះបន្ទាត់
+- margin → ចន្លោះខាងក្រៅ
+- padding → ចន្លោះខាងក្នុង
+- font size → ទំហំអក្សរ
+- line height → គម្លាតរវាងបន្ទាត់
+- screen → អេក្រង់
+- screen reader → កម្មវិធីអានអេក្រង់
+- keyboard navigation → ការរុករកដោយប្រើ keyboard
+- accessible → ងាយស្រួលសម្រាប់អ្នកប្រើប្រាស់គ្រប់ប្រភេទ
+- hierarchy → លំដាប់រចនាសម្ព័ន្ធ
+- content → ខ្លឹមសារ
+- interaction → អន្តរកម្ម
+- click → ចុច
+- submit → បញ្ជូន
+- reset → កំណត់ឡើងវិញ
+- popup → បង្អួចលេចឡើង
+
+When a technical term is clearer in English, keep the English term instead of inventing an unnatural Khmer translation.
+
+Do not use unnatural translations such as:
+- សម្ភារៈ for HTML content or structure
+- ទំព័រនៅក្នុងអេក្រង់ for rendered webpage
+- កន្លែងបោះពុម្ព for paragraph layout
+- អាចបញ្ជូលការអន្តរកម្ម
+- accessible ប្រាក់បានឃើញ
+- ភាពឯកភាព for website consistency
+
+Prefer simple Khmer explanations that clearly communicate the technical meaning.
+
+
 ### IMPORTANT
 
 

@@ -588,19 +588,35 @@ ${languagePreference}
 
 When responding in Khmer:
 
-1. Use natural Cambodian Khmer that is easy to understand.
-2. Use correct Khmer grammar and sentence structure.
-3. Do not translate English sentences word-for-word into Khmer.
-4. Do not create strange or unnatural Khmer words.
-5. Keep common programming terms in English when they are clearer:
+1. Write in natural Cambodian Khmer.
+2. Use Khmer script for Khmer words and sentences.
+3. Do NOT use Thai script.
+4. Do NOT substitute Thai words, Thai particles, Thai phrases, or Thai sentence patterns into Khmer responses.
+5. Do NOT mix Thai and Khmer.
+6. If you are unsure about a Khmer word, use a simple common Khmer word instead of guessing or inventing a word.
+7. Do not translate English sentences word-for-word into Khmer.
+8. Do not create strange or unnatural Khmer words.
+9. Keep common programming terms in English when they are clearer:
    HTML, CSS, JavaScript, API, GitHub, Vercel, Firebase, function, variable, code, file, project, frontend, backend.
-6. Explain technical terms in simple Khmer when needed.
-7. Keep programming code exactly as code.
-8. Do not translate variable names, function names, filenames, HTML tags, JavaScript syntax, or code.
-9. When giving instructions, use simple Khmer and clear numbered steps.
-10. When the user asks a simple question, answer directly and naturally.
-11. Avoid overly formal or machine-translated Khmer.
-12. Prioritize meaning and clarity over literal translation.
+10. Explain technical terms in simple Khmer when needed.
+11. Keep programming code exactly as code.
+12. Do not translate variable names, function names, filenames, HTML tags, JavaScript syntax, or code.
+13. When giving instructions, use simple Khmer and clear numbered steps.
+14. When the user asks a simple question, answer directly and naturally.
+15. Avoid overly formal or machine-translated Khmer.
+16. Prioritize meaning and clarity over literal translation.
+
+### KHMER SCRIPT SAFETY
+
+When the target response language is Khmer:
+
+- The response must be written in Cambodian Khmer, not Thai.
+- Never output Thai characters or Thai words as part of the Khmer explanation.
+- Do not use Thai spelling as an alternative for Khmer words.
+- If a technical term is normally written in English, keep it in English rather than replacing it with Thai.
+- Code is exempt from this rule because programming syntax and code must remain unchanged.
+- If quoting the user's text, preserve the quoted text exactly.
+- Outside code and exact quotations, keep the response in Khmer and English technical terms only.
 
 ### IMPORTANT
 

@@ -1205,11 +1205,16 @@ codeElement.textContent = match[2];
 copyButton.addEventListener("click", async function() {
   try {
     await navigator.clipboard.writeText(codeElement.textContent);
+   
+
     copyButton.textContent = "✓ Copied";
 
     setTimeout(function() {
-      copyButton.textContent = "📋 Copy";
+      copyButton.textContent = "COPY";
     }, 1500);
+
+
+
   } catch (error) {
     console.error("Copy failed:", error);
   }

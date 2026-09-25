@@ -632,10 +632,11 @@
 
      <div class="menu-content">
 
-  <button class="menu-item" type="button">
-    💬
-    <span>Chats</span>
-  </button>
+ <button class="menu-item" type="button" onclick="openChatsList()">
+  💬
+  <span>Chats</span>
+</button>
+
 
 
   <button class="menu-item" type="button">
@@ -1282,6 +1283,75 @@ if (remainingText) {
     renderMessages(
       currentChat.messages
     );
+
+  }
+
+
+  /* =========================
+     OPEN CHATS LIST
+  ========================== */
+
+  function openChatsList() {
+
+    const chats = getChats();
+
+    chat.innerHTML = "";
+
+    if (chats.length === 0) {
+
+      chat.innerHTML = `
+        <div class="welcome">
+          <h1>No chats yet</h1>
+          <p>ចាប់ផ្តើមជជែកថ្មីមួយ</p>
+        </div>
+      `;
+
+    } else {
+
+      chats.forEach(function(chatItem) {
+
+        const row = document.createElement("div");
+        row.className = "message ai";
+        row.style.cursor = "pointer";
+        row.style.display = "flex";
+        row.style.justifyContent = "space-between";
+        row.style.alignItems = "center";
+
+        const titleSpan = document.createElement("span");
+        titleSpan.textContent = chatItem.title;
+
+        row.addEventListener("click", function() {
+          setCurrentChatId(chatItem.id);
+          renderMessages(chatItem.messages);
+          menuOverlay.classList.remove("open");
+        });
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "🗑";
+        deleteBtn.style.border = "none";
+        deleteBtn.style.background = "transparent";
+        deleteBtn.style.cursor = "pointer";
+        deleteBtn.style.fontSize = "16px";
+
+        deleteBtn.addEventListener("click", function(event) {
+          event.stopPropagation();
+          const updatedChats = getChats().filter(c => c.id !== chatItem.id);
+          saveChats(updatedChats);
+          if (getCurrentChatId() === chatItem.id) {
+            setCurrentChatId(null);
+          }
+          openChatsList();
+        });
+
+        row.appendChild(titleSpan);
+        row.appendChild(deleteBtn);
+        chat.appendChild(row);
+
+      });
+
+    }
+
+    menuOverlay.classList.add("open");
 
   }
 

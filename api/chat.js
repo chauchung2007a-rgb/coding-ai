@@ -9,28 +9,36 @@ export default async function handler(req, res) {
     });
   }
 
-  // Simple rate limit
-  if (!globalThis.chatRateLimit) {
-    globalThis.chatRateLimit = {
+   // Rate limit per user (by IP address)
+  if (!globalThis.chatRateLimitByIp) {
+    globalThis.chatRateLimitByIp = new Map();
+  }
+
+  const clientIp =
+    (req.headers["x-forwarded-for"] || "")
+      .split(",")[0]
+      .trim() || "unknown";
+
+  let userLimit = globalThis.chatRateLimitByIp.get(clientIp);
+
+  if (!userLimit || Date.now() > userLimit.resetAt) {
+    userLimit = {
       count: 0,
       resetAt: Date.now() + 60 * 1000
     };
   }
 
-  const rateLimit = globalThis.chatRateLimit;
-
-  if (Date.now() > rateLimit.resetAt) {
-    rateLimit.count = 0;
-    rateLimit.resetAt = Date.now() + 60 * 1000;
-  }
-
-  if (rateLimit.count >= 5) {
+  if (userLimit.count >= 5) {
     return res.status(429).json({
       error: "សូមរង់ចាំ 1 នាទី មុនពេលផ្ញើសារបន្ថែម។"
     });
   }
 
-  rateLimit.count++;
+  userLimit.count++;
+
+  globalThis.chatRateLimitByIp.set(clientIp, userLimit);
+
+
 
   try {
 

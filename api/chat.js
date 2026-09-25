@@ -1,3 +1,5 @@
+import { LANGUAGE_KNOWLEDGE, detectLanguage } from "./languageKnowledge.js";
+
 export default async function handler(req, res) {
 
   // Only allow POST
@@ -48,6 +50,32 @@ const conversationHistory =
   Array.isArray(body.conversationHistory)
     ? body.conversationHistory.slice(-10)
     : [];
+
+// =========================================
+// LANGUAGE KNOWLEDGE DETECTION
+// (pure, local, no network calls)
+// =========================================
+
+const languageDetection = detectLanguage(message);
+
+let languageKnowledgeBlock = "";
+
+if (
+  languageDetection.language &&
+  (
+    languageDetection.confidence === "high" ||
+    languageDetection.confidence === "medium"
+  ) &&
+  LANGUAGE_KNOWLEDGE[languageDetection.language]
+) {
+
+  languageKnowledgeBlock =
+    "\n\n### LANGUAGE KNOWLEDGE: " +
+    languageDetection.language.toUpperCase() +
+    "\n" +
+    LANGUAGE_KNOWLEDGE[languageDetection.language];
+
+}
 
     if (!message) {
       return res.status(400).json({
@@ -693,6 +721,7 @@ When the user asks for code:
 8. Explain briefly what the change affects.
 9. After code, briefly tell the user what to test.
 10. Never claim that code was saved, deployed, committed, or pushed unless the user confirms it.
+11. If you are not confident which programming language the user means, ask a short clarifying question instead of guessing.
 
 ### GITHUB COMMIT RULE
 
@@ -725,6 +754,7 @@ IMPORTANT:
 - Do not redirect the user to /api/agent or /api/project.
 - When answering about the project, use the project context provided below.
 - If the requested information is not present in the project context, say that it was not loaded instead of guessing.
+${languageKnowledgeBlock}
 
 ${projectContext}
 

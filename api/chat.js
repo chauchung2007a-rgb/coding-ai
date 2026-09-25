@@ -826,25 +826,25 @@ let reply =
 
 // Convert plain JavaScript code into a fenced code block
 // when the AI forgot to use Markdown fences.
+
+const codeStartPatterns = [
+  "function ", "const ", "let ", "var ",
+  "def ", "class ", "import ", "print(",
+  "public ", "private ", "#include"
+];
+
 if (
   !reply.includes("```") &&
-  (
-    reply.includes("function ") ||
-    reply.includes("const ") ||
-    reply.includes("let ") ||
-    reply.includes("var ")
-  )
+  codeStartPatterns.some(p => reply.includes(p))
 ) {
   const lines = reply.split("\n");
 
   const codeStart = lines.findIndex(function(line) {
-    return (
-      line.trim().startsWith("function ") ||
-      line.trim().startsWith("const ") ||
-      line.trim().startsWith("let ") ||
-      line.trim().startsWith("var ")
+    return codeStartPatterns.some(p =>
+      line.trim().startsWith(p)
     );
   });
+
 
   if (codeStart !== -1) {
     const beforeCode = lines
@@ -857,11 +857,20 @@ if (
       .join("\n")
       .trim();
 
+   
+          const fenceTag =
+      languageDetection.language === "python" ? "python" :
+      languageDetection.language === "cpp" ? "cpp" :
+      languageDetection.language === "c" ? "c" :
+      languageDetection.language === "java" ? "java" :
+      "js";
+
     reply =
       (beforeCode ? beforeCode + "\n\n" : "") +
-      "```js\n" +
+      "```" + fenceTag + "\n" +
       code +
       "\n```";
+
   }
 }
 

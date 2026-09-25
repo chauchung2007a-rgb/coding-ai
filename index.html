@@ -632,11 +632,6 @@
 
      <div class="menu-content">
 
- <button class="menu-item" type="button" onclick="openChatsList()">
-  💬
-  <span>Chats</span>
-</button>
-
 
 
   <button class="menu-item" type="button">
@@ -657,6 +652,8 @@
   </button>
 
 
+   <div id="chatListContainer"></div>
+
   <button
     class="menu-item new-chat"
     type="button"
@@ -665,6 +662,7 @@
     ＋
     <span>New Chat</span>
   </button>
+
 
 </div>
 
@@ -900,13 +898,16 @@
   );
 
 
-  /* =========================
+   /* =========================
      CLOSE MENU
   ========================== */
+
+  renderChatList();
 
   menuOverlay.classList.remove(
     "open"
   );
+
 
 
   /* =========================
@@ -1288,6 +1289,76 @@ if (remainingText) {
 
 
   /* =========================
+     RENDER CHAT LIST (SIDE MENU)
+  ========================== */
+
+  function renderChatList() {
+
+    const container =
+      document.getElementById("chatListContainer");
+
+    if (!container) return;
+
+    const chats = getChats();
+
+    container.innerHTML = "";
+
+    chats.forEach(function(chatItem) {
+
+      const row = document.createElement("button");
+      row.className = "menu-item";
+      row.type = "button";
+      row.style.justifyContent = "space-between";
+
+      const titleSpan = document.createElement("span");
+      titleSpan.textContent = chatItem.title;
+      titleSpan.style.overflow = "hidden";
+      titleSpan.style.textOverflow = "ellipsis";
+      titleSpan.style.whiteSpace = "nowrap";
+
+      row.appendChild(titleSpan);
+
+      const deleteBtn = document.createElement("span");
+      deleteBtn.textContent = "🗑";
+      deleteBtn.style.marginLeft = "8px";
+
+      row.appendChild(deleteBtn);
+
+      row.addEventListener("click", function(event) {
+
+        if (event.target === deleteBtn) {
+
+          const updatedChats =
+            getChats().filter(c => c.id !== chatItem.id);
+
+          saveChats(updatedChats);
+
+          if (getCurrentChatId() === chatItem.id) {
+            setCurrentChatId(null);
+            renderMessages([]);
+          }
+
+          renderChatList();
+
+        } else {
+
+          setCurrentChatId(chatItem.id);
+          renderMessages(chatItem.messages);
+          menuOverlay.classList.remove("open");
+
+        }
+
+      });
+
+      container.appendChild(row);
+
+    });
+
+  }
+
+
+
+  /* =========================
      OPEN CHATS LIST
   ========================== */
 
@@ -1360,9 +1431,11 @@ if (remainingText) {
      MENU
   ========================== */
 
-  menuButton.addEventListener(
+   menuButton.addEventListener(
     "click",
     function() {
+
+      renderChatList();
 
       menuOverlay.classList.add(
         "open"
@@ -1370,6 +1443,7 @@ if (remainingText) {
 
     }
   );
+
 
 
   menuClose.addEventListener(
@@ -1669,12 +1743,14 @@ renderMessages(
 
   }
 
-
   /* =========================
      STARTUP
   ========================== */
 
   loadCurrentChat();
+  renderChatList();
+
+ 
 
 
 </script>

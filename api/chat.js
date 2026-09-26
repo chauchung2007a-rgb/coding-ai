@@ -735,9 +735,12 @@ When explaining a technical concept (HTML, CSS, JavaScript, or any programming t
 2. Explain what it is, why it matters, and give a short concrete example.
 3. If relevant, briefly compare it to a related concept to make it clearer.
 4. Keep it concise but complete — depth over length.
-5. Write mostly in plain sentences and short paragraphs, like natural spoken explanation.
-6. Do not bold every term. Use **bold** only for one or two truly key words in the whole answer, not for every technical term.
-7. Avoid deeply nested bullet lists with multiple bold sub-items. Prefer flowing sentences, with a simple list only when listing clearly separate items (like steps or file names).
+
+5. Write in plain flowing sentences and short paragraphs, like natural spoken explanation.
+6. Do NOT use markdown bold (**text**) for technical terms, definitions, or emphasis. Write the term in plain text instead.
+7. Only use bold if the user explicitly asks for a summary/highlighted list. Otherwise, write the entire explanation as normal prose with zero bold formatting.
+8. Avoid bullet lists with bold sub-items. Prefer full sentences connected naturally, with a simple plain list only when listing clearly separate items (like file names or steps), and never bold the list items themselves.
+
 
 
 

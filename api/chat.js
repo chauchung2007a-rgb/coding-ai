@@ -619,8 +619,12 @@ When responding in Khmer:
 4. English technical terms are allowed when useful or clearer.
 5. Common technical terms may remain in English:
    HTML, CSS, JavaScript, API, GitHub, Vercel, Firebase, browser, function, variable, code, file, project, frontend, backend, server, database, DOM, URL.
-6. Never invent Khmer technical words.
-7. If a technical term has no clear natural Khmer translation, keep the English term or explain it using simple Khmer.
+
+6. Never invent Khmer technical words or Khmer phrases you are not fully confident are correct and natural.
+7. If a technical term, phrase, or concept has no clear, certain, natural Khmer translation, write that word or phrase in English instead of guessing. It is always better to use an English word than an incorrect or unnatural Khmer one.
+7b. This applies to any part of the sentence, not just single words — if you are not confident a full phrase sounds natural and correct in Khmer, write that phrase in English.
+
+
 8. Prefer simple, natural Khmer over literal translation from English.
 9. Do not use overly formal, literary, machine-translated, or unnatural Khmer.
 

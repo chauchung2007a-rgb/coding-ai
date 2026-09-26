@@ -1334,11 +1334,13 @@ if (remainingText) {
 
     if (!container) return;
 
-    const chats = getChats();
+       const chats =
+      getChats().filter(c => !c.deletedAt);
 
     container.innerHTML = "";
 
     chats.forEach(function(chatItem) {
+
 
       const row = document.createElement("button");
       row.className = "menu-item";
@@ -1361,12 +1363,19 @@ if (remainingText) {
 
       row.addEventListener("click", function(event) {
 
-        if (event.target === deleteBtn) {
+               if (event.target === deleteBtn) {
 
-          const updatedChats =
-            getChats().filter(c => c.id !== chatItem.id);
+          const allChats = getChats();
 
-          saveChats(updatedChats);
+          const targetIndex =
+            allChats.findIndex(c => c.id === chatItem.id);
+
+          if (targetIndex !== -1) {
+            allChats[targetIndex].deletedAt =
+              new Date().toISOString();
+          }
+
+          saveChats(allChats);
 
           if (getCurrentChatId() === chatItem.id) {
             setCurrentChatId(null);
@@ -1376,6 +1385,7 @@ if (remainingText) {
           renderChatList();
 
         } else {
+
 
           setCurrentChatId(chatItem.id);
           renderMessages(chatItem.messages);
@@ -1670,6 +1680,58 @@ const conversationHistory =
     : [];
 
 
+/* =========================
+   PAST CHATS CONTEXT
+   (only gathered when the user
+   seems to reference an old chat)
+========================= */
+
+const pastChatKeywords = [
+  "លើកមុន",
+  "ដូចធ្លាប់",
+  "ធ្លាប់សួរ",
+  "ចាំបានទេ",
+  "last time",
+  "before",
+  "previously"
+];
+
+const wantsPastChats =
+  pastChatKeywords.some(keyword =>
+    message.toLowerCase().includes(keyword.toLowerCase())
+  );
+
+let pastChatsContext = "";
+
+if (wantsPastChats) {
+
+  const otherChats =
+    getChats().filter(c =>
+      !currentChat || c.id !== currentChat.id
+    );
+
+  const snippets = [];
+
+  otherChats.forEach(function(c) {
+
+    const text =
+      (c.messages || [])
+        .map(m => m.role + ": " + m.text)
+        .join("\n");
+
+    snippets.push(
+      "===== " + c.title + " =====\n" + text
+    );
+
+  });
+
+  pastChatsContext =
+    snippets.join("\n\n").slice(0, 6000);
+
+}
+
+
+
 try {
 
       /*
@@ -1689,13 +1751,16 @@ try {
                 "application/json"
             },
 
-          body: JSON.stringify({
+                   body: JSON.stringify({
   message: message,
   languagePreference:
     localStorage.getItem("languagePreference") || "auto",
   conversationHistory:
-    conversationHistory
+    conversationHistory,
+  pastChatsContext:
+    pastChatsContext
 })
+
 
           }
         );
@@ -1850,12 +1915,43 @@ renderMessages(
   }
 
 
+ 
+  /* =========================
+     PURGE OLD DELETED CHATS
+     (permanently remove after 30 days)
+  ========================== */
+
+  function purgeOldDeletedChats() {
+
+    const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
+
+    const now = Date.now();
+
+    const remainingChats =
+      getChats().filter(function(chatItem) {
+
+        if (!chatItem.deletedAt) return true;
+
+        const deletedTime =
+          new Date(chatItem.deletedAt).getTime();
+
+        return (now - deletedTime) < ONE_MONTH_MS;
+
+      });
+
+    saveChats(remainingChats);
+
+  }
+
+
   /* =========================
      STARTUP
   ========================== */
 
+  purgeOldDeletedChats();
   loadCurrentChat();
   renderChatList();
+
 
 
 

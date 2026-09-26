@@ -1368,45 +1368,66 @@ if (remainingText) {
       row.appendChild(titleSpan);
 
 
-      const deleteBtn = document.createElement("span");
-      deleteBtn.textContent = "🗑";
-      deleteBtn.style.marginLeft = "8px";
+           let longPressTimer = null;
+      let didLongPress = false;
 
-      row.appendChild(deleteBtn);
+      function startLongPress() {
+        didLongPress = false;
+        longPressTimer = setTimeout(function() {
 
-      row.addEventListener("click", function(event) {
+          didLongPress = true;
 
-               if (event.target === deleteBtn) {
+          const confirmed = confirm(
+            "លុបសន្ទនា \"" + chatItem.title + "\" មែនទេ?"
+          );
 
-          const allChats = getChats();
+          if (confirmed) {
 
-          const targetIndex =
-            allChats.findIndex(c => c.id === chatItem.id);
+            const allChats = getChats();
 
-          if (targetIndex !== -1) {
-            allChats[targetIndex].deletedAt =
-              new Date().toISOString();
+            const targetIndex =
+              allChats.findIndex(c => c.id === chatItem.id);
+
+            if (targetIndex !== -1) {
+              allChats[targetIndex].deletedAt =
+                new Date().toISOString();
+            }
+
+            saveChats(allChats);
+
+            if (getCurrentChatId() === chatItem.id) {
+              setCurrentChatId(null);
+              renderMessages([]);
+            }
+
+            renderChatList();
+
           }
 
-          saveChats(allChats);
+        }, 600);
+      }
 
-          if (getCurrentChatId() === chatItem.id) {
-            setCurrentChatId(null);
-            renderMessages([]);
-          }
+      function cancelLongPress() {
+        clearTimeout(longPressTimer);
+      }
 
-          renderChatList();
+      row.addEventListener("touchstart", startLongPress);
+      row.addEventListener("touchend", cancelLongPress);
+      row.addEventListener("touchmove", cancelLongPress);
+      row.addEventListener("mousedown", startLongPress);
+      row.addEventListener("mouseup", cancelLongPress);
+      row.addEventListener("mouseleave", cancelLongPress);
 
-        } else {
+      row.addEventListener("click", function() {
 
+        if (didLongPress) return;
 
-          setCurrentChatId(chatItem.id);
-          renderMessages(chatItem.messages);
-          menuOverlay.classList.remove("open");
-
-        }
+        setCurrentChatId(chatItem.id);
+        renderMessages(chatItem.messages);
+        menuOverlay.classList.remove("open");
 
       });
+
 
       container.appendChild(row);
 

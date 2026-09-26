@@ -636,7 +636,7 @@
       id="sideMenu"
     >
 
-      <div class="menu-header">
+           <div class="menu-header">
 
         <button
           class="menu-close"
@@ -646,9 +646,10 @@
           ×
         </button>
 
-        <span>Coding AI</span>
+        <span id="userProfileName">Coding AI</span>
 
       </div>
+
 
 
      <div class="menu-content">
@@ -1919,7 +1920,22 @@ renderMessages(
      SETTINGS: LANGUAGE PREFERENCE
   ========================== */
 
+ 
+
   function openSettings() {
+
+    const currentName =
+      localStorage.getItem("userName") || "";
+
+    const newName = prompt(
+      "ដាក់ឈ្មោះរបស់អ្នក៖",
+      currentName
+    );
+
+    if (newName !== null && newName.trim()) {
+      localStorage.setItem("userName", newName.trim());
+      renderUserProfile();
+    }
 
     const current =
       localStorage.getItem("languagePreference") || "auto";
@@ -1978,6 +1994,27 @@ renderMessages(
   }
 
 
+ 
+  /* =========================
+     USER PROFILE
+  ========================== */
+
+  function renderUserProfile() {
+
+    const nameEl =
+      document.getElementById("userProfileName");
+
+    if (!nameEl) return;
+
+    const savedName =
+      localStorage.getItem("userName");
+
+    nameEl.textContent =
+      savedName ? savedName : "Coding AI";
+
+  }
+
+
   /* =========================
      STARTUP
   ========================== */
@@ -1985,6 +2022,8 @@ renderMessages(
   purgeOldDeletedChats();
   loadCurrentChat();
   renderChatList();
+  renderUserProfile();
+
 
 
 

@@ -1347,6 +1347,17 @@ if (remainingText) {
       row.type = "button";
       row.style.justifyContent = "space-between";
 
+           const iconImg = document.createElement("img");
+      iconImg.src = "chat-icon.PNG";
+      iconImg.alt = "";
+      iconImg.style.width = "18px";
+      iconImg.style.height = "18px";
+      iconImg.style.objectFit = "contain";
+      iconImg.style.marginRight = "8px";
+      iconImg.style.flexShrink = "0";
+
+      row.appendChild(iconImg);
+
       const titleSpan = document.createElement("span");
       titleSpan.textContent = chatItem.title;
       titleSpan.style.overflow = "hidden";
@@ -1354,6 +1365,7 @@ if (remainingText) {
       titleSpan.style.whiteSpace = "nowrap";
 
       row.appendChild(titleSpan);
+
 
       const deleteBtn = document.createElement("span");
       deleteBtn.textContent = "🗑";

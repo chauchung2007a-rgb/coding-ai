@@ -1786,15 +1786,18 @@ try {
                 "application/json"
             },
 
-                   body: JSON.stringify({
+                            body: JSON.stringify({
   message: message,
   languagePreference:
     localStorage.getItem("languagePreference") || "auto",
   conversationHistory:
     conversationHistory,
   pastChatsContext:
-    pastChatsContext
+    pastChatsContext,
+  userName:
+    localStorage.getItem("userName") || ""
 })
+
 
 
           }

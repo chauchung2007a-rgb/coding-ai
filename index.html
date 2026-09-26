@@ -667,10 +667,11 @@
   </button>
 
 
-  <button class="menu-item" type="button">
+   <button class="menu-item" type="button" onclick="openSettings()">
     ⚙
     <span>Settings</span>
   </button>
+
 
 
    <div id="chatListContainer"></div>
@@ -1817,12 +1818,48 @@ renderMessages(
   }
 
 
+ 
+  /* =========================
+     SETTINGS: LANGUAGE PREFERENCE
+  ========================== */
+
+  function openSettings() {
+
+    const current =
+      localStorage.getItem("languagePreference") || "auto";
+
+    const choice = prompt(
+      "ជ្រើសរើសភាសាចម្លើយ៖\n" +
+      "វាយ km = ខ្មែរ\n" +
+      "វាយ vi = វៀតណាម\n" +
+      "វាយ en = អង់គ្លេស\n" +
+      "វាយ auto = ស្វែងរកដោយស្វ័យប្រវត្តិ",
+      current
+    );
+
+    if (!choice) return;
+
+    const trimmed = choice.trim().toLowerCase();
+
+    if (["km", "vi", "en", "auto"].includes(trimmed)) {
+      localStorage.setItem("languagePreference", trimmed);
+      alert("បានរក្សាទុក! ភាសា: " + trimmed);
+    } else {
+      alert("សូមវាយ km, vi, en, ឬ auto ប៉ុណ្ណោះ។");
+    }
+
+    menuOverlay.classList.remove("open");
+
+  }
+
+
   /* =========================
      STARTUP
   ========================== */
 
   loadCurrentChat();
   renderChatList();
+
 
 
  

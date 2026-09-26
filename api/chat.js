@@ -59,6 +59,12 @@ const conversationHistory =
     ? body.conversationHistory.slice(-10)
     : [];
 
+const pastChatsContext =
+  typeof body.pastChatsContext === "string"
+    ? body.pastChatsContext.slice(0, 6000)
+    : "";
+
+
 // =========================================
 // LANGUAGE KNOWLEDGE DETECTION
 // (pure, local, no network calls)
@@ -805,12 +811,20 @@ IMPORTANT:
 - Do not invent another file list.
 - Do not redirect the user to /api/agent or /api/project.
 - When answering about the project, use the project context provided below.
+
 - If the requested information is not present in the project context, say that it was not loaded instead of guessing.
+
+### PAST CHAT HISTORY CONTEXT
+
+If the section below is not empty, it contains messages from the user's other past conversations, provided because the user's current message seems to reference something from before. Use it to answer accurately. If it is empty, the user did not reference past chats, so ignore this section entirely.
+
+${pastChatsContext}
 ${languageKnowledgeBlock}
 
 ${projectContext}
 
 `;
+
 
 
      // Send request to Groq

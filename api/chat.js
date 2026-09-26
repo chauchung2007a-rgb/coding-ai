@@ -64,6 +64,12 @@ const pastChatsContext =
     ? body.pastChatsContext.slice(0, 6000)
     : "";
 
+const userName =
+  typeof body.userName === "string"
+    ? body.userName.trim().slice(0, 50)
+    : "";
+
+
 
 // =========================================
 // LANGUAGE KNOWLEDGE DETECTION
@@ -814,7 +820,12 @@ IMPORTANT:
 
 - If the requested information is not present in the project context, say that it was not loaded instead of guessing.
 
+### USER NAME
+
+${userName ? `The user's name is "${userName}". Address them by this name naturally where it fits (e.g. greetings), but do not force it into every single sentence.` : "The user has not provided a name. Do not guess or invent one."}
+
 ### PAST CHAT HISTORY CONTEXT
+
 
 If the section below is not empty, it contains messages from the user's other past conversations, provided because the user's current message seems to reference something from before. Use it to answer accurately. If it is empty, the user did not reference past chats, so ignore this section entirely.
 

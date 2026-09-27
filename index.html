@@ -2009,26 +2009,28 @@ try {
          SHOW AI RESPONSE
       ========================== */
 
-     const aiReply =
+         const aiReply =
   data.reply ||
   "AI មិនបានផ្ញើចម្លើយមកទេ។";
 
-aiMessage.textContent =
-  aiReply;
-
 
       /* =========================
-         SAVE AI MESSAGE
+         TYPEWRITER REVEAL, THEN SAVE
       ========================== */
 
-   addMessageToCurrentChat(
-  "ai",
-  aiReply
-);
+typewriterReveal(aiMessage, aiReply, function() {
 
-renderMessages(
-  getCurrentChat().messages
-);
+  addMessageToCurrentChat(
+    "ai",
+    aiReply
+  );
+
+  renderMessages(
+    getCurrentChat().messages
+  );
+
+});
+
 
 
     } catch (error) {
@@ -2214,9 +2216,46 @@ renderMessages(
   }
 
 
+ 
+  /* =========================
+     TYPEWRITER REVEAL EFFECT
+  ========================== */
+
+  function typewriterReveal(element, text, callback) {
+
+    element.textContent = "";
+
+    const words = text.split(" ");
+
+    let index = 0;
+
+    function revealNext() {
+
+      if (index >= words.length) {
+        if (callback) callback();
+        return;
+      }
+
+      element.textContent +=
+        (index > 0 ? " " : "") + words[index];
+
+      chat.scrollTop = chat.scrollHeight;
+
+      index++;
+
+      setTimeout(revealNext, 18);
+
+    }
+
+    revealNext();
+
+  }
+
+
   /* =========================
      STARTUP
   ========================== */
+
 
   purgeOldDeletedChats();
   loadCurrentChat();

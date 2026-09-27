@@ -69,6 +69,13 @@ const userName =
     ? body.userName.trim().slice(0, 50)
     : "";
 
+const imageBase64 =
+  typeof body.imageBase64 === "string" &&
+  body.imageBase64.startsWith("data:image")
+    ? body.imageBase64
+    : null;
+
+
 
 
 // =========================================
@@ -952,18 +959,15 @@ const response = await fetch(
       "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
     },
 
-      body: JSON.stringify({
-  model: "openai/gpt-oss-20b",
+        const groqRequestBody = {
 
-   max_tokens: 3000,
+  model: imageBase64
+    ? "meta-llama/llama-4-scout-17b-16e-instruct"
+    : "openai/gpt-oss-20b",
 
-  reasoning_effort: "high",
-
+  max_tokens: 3000,
 
   messages: [
-
-
-
         {
           role: "system",
           content: systemPrompt
@@ -979,12 +983,24 @@ const response = await fetch(
 
         {
           role: "user",
-          content: message
+          content: imageBase64
+            ? [
+                { type: "text", text: message },
+                { type: "image_url", image_url: { url: imageBase64 } }
+              ]
+            : message
         }
       ]
-    })
+    };
+
+if (!imageBase64) {
+  groqRequestBody.reasoning_effort = "high";
+}
+
+body: JSON.stringify(groqRequestBody)
   }
 );
+
 
 const responseText = await response.text();
 

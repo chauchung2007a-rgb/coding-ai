@@ -959,13 +959,14 @@ const response = await fetch(
       "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
     },
 
-        const groqRequestBody = {
-
+          body: JSON.stringify({
   model: imageBase64
     ? "meta-llama/llama-4-scout-17b-16e-instruct"
     : "openai/gpt-oss-20b",
 
   max_tokens: 3000,
+
+  ...(imageBase64 ? {} : { reasoning_effort: "high" }),
 
   messages: [
         {
@@ -991,15 +992,10 @@ const response = await fetch(
             : message
         }
       ]
-    };
-
-if (!imageBase64) {
-  groqRequestBody.reasoning_effort = "high";
-}
-
-body: JSON.stringify(groqRequestBody)
+    })
   }
 );
+
 
 
 const responseText = await response.text();

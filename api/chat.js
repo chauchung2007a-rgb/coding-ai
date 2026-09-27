@@ -1024,6 +1024,17 @@ let reply =
   data?.choices?.[0]?.message?.content ||
   "AI មិនបានផ្ញើចម្លើយមកទេ។";
 
+// =========================================
+// FORCE-REMOVE MARKDOWN BOLD (**text**)
+// User strongly dislikes asterisks; this
+// guarantees removal regardless of what
+// the model outputs, for any model used.
+// =========================================
+
+reply = reply.replace(/\*\*(.+?)\*\*/g, "$1");
+reply = reply.replace(/\*(.+?)\*/g, "$1");
+
+
 // Convert plain JavaScript code into a fenced code block
 // when the AI forgot to use Markdown fences.
 

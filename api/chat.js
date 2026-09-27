@@ -960,9 +960,10 @@ const response = await fetch(
     },
 
           body: JSON.stringify({
-  model: imageBase64
-    ? "meta-llama/llama-4-scout-17b-16e-instruct"
+   model: imageBase64
+    ? "qwen/qwen3.6-27b"
     : "openai/gpt-oss-20b",
+
 
   max_tokens: 3000,
 

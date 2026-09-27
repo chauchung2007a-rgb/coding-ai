@@ -893,7 +893,12 @@ If the section below is not empty, it contains messages from the user's other pa
 
 ${pastChatsContext}
 
+### TOOL USE RESTRICTION
+
+You have NO tools, functions, or browser access available in this conversation. Never attempt to call any tool or function. If you need external information, use ONLY the WEB SEARCH RESULTS section below (already fetched for you) or answer from your own knowledge — never try to search or browse yourself.
+
 ### WEB SEARCH RESULTS
+
 
 If the section below is not empty, it contains fresh results from a live web search, because the user's message seems to need current information from the internet. Use it to answer accurately, and mention the source URL when you use a fact from it. If it is empty, no web search was needed, so ignore this section entirely.
 

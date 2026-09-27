@@ -480,14 +480,14 @@
        SETTINGS PANEL
     ========================= */
 
-    .settings-overlay {
+       .settings-overlay {
       position: fixed;
       inset: 0;
 
       background: rgba(0, 0, 0, 0.35);
 
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: center;
 
       opacity: 0;
@@ -504,32 +504,46 @@
     }
 
     .settings-panel {
-      width: min(340px, 88vw);
+      width: 100%;
+
+      max-width: 800px;
+
+      max-height: 85vh;
 
       background: #ffffff;
 
-      border-radius: 18px;
+      border-radius: 24px 24px 0 0;
 
       overflow: hidden;
 
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25);
+
+      transform: translateY(20px);
+
+      transition: transform 0.25s ease;
+    }
+
+    .settings-overlay.open .settings-panel {
+      transform: translateY(0);
     }
 
     .settings-header {
-      height: 54px;
+      height: 58px;
 
       display: flex;
       align-items: center;
       justify-content: space-between;
 
-      padding: 0 16px;
+      padding: 0 20px;
 
       font-weight: 600;
-      font-size: 17px;
+      font-size: 19px;
       color: #111;
 
       border-bottom: 1px solid #eee;
     }
+
+
 
     .settings-close {
       border: none;

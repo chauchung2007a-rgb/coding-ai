@@ -933,12 +933,17 @@ const response = await fetch(
       "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
     },
 
-   body: JSON.stringify({
+      body: JSON.stringify({
   model: "openai/gpt-oss-20b",
 
   max_tokens: 1500,
 
+  reasoning_effort: "high",
+
   messages: [
+
+
+
         {
           role: "system",
           content: systemPrompt

@@ -775,22 +775,38 @@
 
   <div class="input-area">
 
+       <div id="imagePreviewContainer" style="display:none; max-width:800px; margin:0 auto 8px; padding:0 4px;">
+      <div style="position:relative; display:inline-block;">
+        <img id="imagePreviewThumb" style="max-height:64px; border-radius:10px; display:block;">
+        <button type="button" id="imageRemoveBtn" style="position:absolute; top:-6px; right:-6px; width:20px; height:20px; border-radius:50%; border:none; background:#111; color:#fff; font-size:12px; cursor:pointer;">×</button>
+      </div>
+    </div>
+
     <div class="input-box">
 
-      <button
+
+           <button
         class="plus-button"
         id="plusButton"
         type="button"
         aria-label="Add"
+        onclick="document.getElementById('imageInput').click()"
       >
         ＋
       </button>
 
+      <input
+        type="file"
+        id="imageInput"
+        accept="image/*"
+        style="display:none;"
+      >
 
       <textarea
         id="messageInput"
         placeholder="Message Coding AI..."
       ></textarea>
+
 
 
       <button
@@ -961,8 +977,63 @@
   const menuClose =
     document.getElementById("menuClose");
 
-  const menuOverlay =
+   const menuOverlay =
     document.getElementById("menuOverlay");
+
+  const imageInput =
+    document.getElementById("imageInput");
+
+  const imagePreviewContainer =
+    document.getElementById("imagePreviewContainer");
+
+  const imagePreviewThumb =
+    document.getElementById("imagePreviewThumb");
+
+  const imageRemoveBtn =
+    document.getElementById("imageRemoveBtn");
+
+  let selectedImageBase64 = null;
+
+
+  imageInput.addEventListener("change", function() {
+
+    const file = imageInput.files[0];
+
+    if (!file) return;
+
+    if (file.size > 4 * 1024 * 1024) {
+      alert("រូបភាពធំពេក (កំណត់ត្រឹម 4MB)។");
+      imageInput.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+
+      selectedImageBase64 = event.target.result;
+
+      imagePreviewThumb.src = selectedImageBase64;
+
+      imagePreviewContainer.style.display = "block";
+
+    };
+
+    reader.readAsDataURL(file);
+
+  });
+
+
+  imageRemoveBtn.addEventListener("click", function() {
+
+    selectedImageBase64 = null;
+
+    imageInput.value = "";
+
+    imagePreviewContainer.style.display = "none";
+
+  });
+
 
 
   /* =========================
@@ -1965,12 +2036,19 @@ if (remainingText) {
     );
 
 
-    messageInput.value =
+       messageInput.value =
       "";
 
 
     messageInput.style.height =
       "48px";
+
+
+    imagePreviewContainer.style.display = "none";
+
+    imageInput.value = "";
+
+    selectedImageBase64 = null;
 
 
     chat.scrollTop =
@@ -1979,6 +2057,7 @@ if (remainingText) {
 
    sendButton.disabled =
   true;
+
 
 
 /* =========================
@@ -2071,7 +2150,7 @@ try {
                 "application/json"
             },
 
-                            body: JSON.stringify({
+                                     body: JSON.stringify({
   message: message,
   languagePreference:
     localStorage.getItem("languagePreference") || "auto",
@@ -2080,8 +2159,11 @@ try {
   pastChatsContext:
     pastChatsContext,
   userName:
-    localStorage.getItem("userName") || ""
+    localStorage.getItem("userName") || "",
+  imageBase64:
+    selectedImageBase64
 })
+
 
 
 

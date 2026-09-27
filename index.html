@@ -824,13 +824,32 @@
           <option value="en">អង់គ្លេស</option>
         </select>
 
-        <button type="button" id="settingsSaveBtn" class="settings-save-btn">រក្សាទុក</button>
+               <button type="button" id="settingsSaveBtn" class="settings-save-btn">រក្សាទុក</button>
+
+        <button type="button" id="settingsFeedbackBtn" class="settings-save-btn" style="background:#eee; color:#111; margin-top:8px;">មើលមតិយោបល់ 👎</button>
 
       </div>
 
     </div>
 
   </div>
+
+
+  <div class="settings-overlay" id="feedbackOverlay">
+
+    <div class="settings-panel" style="max-height:80vh; display:flex; flex-direction:column;">
+
+      <div class="settings-header">
+        <span>មតិយោបល់ 👎</span>
+        <button type="button" id="feedbackCloseBtn" class="settings-close">×</button>
+      </div>
+
+      <div id="feedbackListBody" style="padding:16px; overflow-y:auto;"></div>
+
+    </div>
+
+  </div>
+
 
   <div
     class="menu-overlay"
@@ -2357,9 +2376,110 @@ typewriterReveal(aiMessage, aiReply, function() {
   }
 
 
+ 
+  /* =========================
+     FEEDBACK REVIEW PANEL
+  ========================== */
+
+  const feedbackOverlay =
+    document.getElementById("feedbackOverlay");
+
+  const feedbackListBody =
+    document.getElementById("feedbackListBody");
+
+  const settingsFeedbackBtn =
+    document.getElementById("settingsFeedbackBtn");
+
+  const feedbackCloseBtn =
+    document.getElementById("feedbackCloseBtn");
+
+  function renderFeedbackList() {
+
+    const feedbackMap = getFeedbackMap();
+
+    const allChats = getChats();
+
+    const entries = [];
+
+    allChats.forEach(function(chatItem) {
+
+      const messages = chatItem.messages || [];
+
+      messages.forEach(function(message, index) {
+
+        if (message.role === "user") return;
+
+        const key =
+          chatItem.id + "_" + (message.timestamp || "");
+
+        if (feedbackMap[key] !== "down") return;
+
+        const previousUserMessage =
+          messages[index - 1] &&
+          messages[index - 1].role === "user"
+            ? messages[index - 1].text
+            : "(សំណួរមិនស្គាល់)";
+
+        entries.push({
+          chatTitle: chatItem.title,
+          question: previousUserMessage,
+          answer: message.text
+        });
+
+      });
+
+    });
+
+    if (entries.length === 0) {
+
+      feedbackListBody.innerHTML =
+        "<p>មិនទាន់មានមតិយោបល់ 👎 នៅឡើយទេ។</p>";
+
+      return;
+
+    }
+
+    feedbackListBody.innerHTML = "";
+
+    entries.forEach(function(entry) {
+
+      const block = document.createElement("div");
+      block.style.marginBottom = "16px";
+      block.style.paddingBottom = "12px";
+      block.style.borderBottom = "1px solid #eee";
+
+      block.innerHTML =
+        "<div style='font-size:12px; color:#888;'>" + entry.chatTitle + "</div>" +
+        "<div style='font-weight:600; margin-top:4px;'>Q: " + entry.question + "</div>" +
+        "<div style='margin-top:4px; white-space:pre-wrap;'>A: " + entry.answer + "</div>";
+
+      feedbackListBody.appendChild(block);
+
+    });
+
+  }
+
+  settingsFeedbackBtn.addEventListener("click", function() {
+    settingsOverlay.classList.remove("open");
+    renderFeedbackList();
+    feedbackOverlay.classList.add("open");
+  });
+
+  feedbackCloseBtn.addEventListener("click", function() {
+    feedbackOverlay.classList.remove("open");
+  });
+
+  feedbackOverlay.addEventListener("click", function(event) {
+    if (event.target === feedbackOverlay) {
+      feedbackOverlay.classList.remove("open");
+    }
+  });
+
+
   /* =========================
      STARTUP
   ========================== */
+
 
 
 

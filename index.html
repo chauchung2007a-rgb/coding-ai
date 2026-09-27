@@ -2049,11 +2049,14 @@ if (remainingText) {
       "48px";
 
 
+       const imageToSend = selectedImageBase64;
+
     imagePreviewContainer.style.display = "none";
 
     imageInput.value = "";
 
     selectedImageBase64 = null;
+
 
 
     chat.scrollTop =
@@ -2163,11 +2166,13 @@ try {
     conversationHistory,
   pastChatsContext:
     pastChatsContext,
-  userName:
+ 
+   userName:
     localStorage.getItem("userName") || "",
   imageBase64:
-    selectedImageBase64
+    imageToSend
 })
+
 
 
 

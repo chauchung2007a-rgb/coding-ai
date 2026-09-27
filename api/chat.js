@@ -108,20 +108,23 @@ if (wantsWebSearch && process.env.TAVILY_API_KEY) {
 
   try {
 
-    const searchResponse = await fetch(
+       const searchResponse = await fetch(
       "https://api.tavily.com/search",
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.TAVILY_API_KEY}`
+        },
         body: JSON.stringify({
-          api_key: process.env.TAVILY_API_KEY,
           query: message,
           max_results: 3
         })
       }
     );
 
-    if (searchResponse.ok) {
+
+       if (searchResponse.ok) {
 
       const searchData = await searchResponse.json();
 
@@ -134,7 +137,14 @@ if (wantsWebSearch && process.env.TAVILY_API_KEY) {
         .join("\n\n")
         .slice(0, 4000);
 
+    } else {
+
+      const errorText = await searchResponse.text();
+      console.error("Tavily API error:", searchResponse.status, errorText);
+
     }
+
+
 
   } catch (error) {
     console.error("Tavily search error:", error);

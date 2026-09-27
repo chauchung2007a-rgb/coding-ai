@@ -588,9 +588,45 @@
     }
 
 
-       /* =========================
+          /* =========================
+       FEEDBACK BUTTONS
+    ========================= */
+
+    .feedback-row {
+      display: flex;
+      gap: 6px;
+
+      margin-top: 6px;
+    }
+
+    .feedback-btn {
+      border: none;
+      background: transparent;
+
+      font-size: 15px;
+
+      opacity: 0.4;
+
+      cursor: pointer;
+
+      padding: 2px 6px;
+
+      border-radius: 8px;
+    }
+
+    .feedback-btn.selected {
+      opacity: 1;
+    }
+
+    .feedback-btn:active {
+      background: rgba(0,0,0,0.06);
+    }
+
+
+    /* =========================
        LOADING SPINNER
     ========================= */
+
 
     .spinner {
       width: 26px;
@@ -1455,12 +1491,54 @@ if (remainingText) {
 
 }
 
-      chat.appendChild(
+           chat.appendChild(
         messageElement
       );
 
+      if (message.role !== "user") {
+
+        const feedbackKey =
+          getCurrentChatId() + "_" + (message.timestamp || "");
+
+        const savedFeedback =
+          getFeedbackMap()[feedbackKey];
+
+        const feedbackRow =
+          document.createElement("div");
+        feedbackRow.className = "feedback-row";
+
+        const upBtn = document.createElement("button");
+        upBtn.className = "feedback-btn";
+        upBtn.textContent = "👍";
+        if (savedFeedback === "up") upBtn.classList.add("selected");
+
+        const downBtn = document.createElement("button");
+        downBtn.className = "feedback-btn";
+        downBtn.textContent = "👎";
+        if (savedFeedback === "down") downBtn.classList.add("selected");
+
+        upBtn.addEventListener("click", function() {
+          saveFeedback(feedbackKey, "up");
+          upBtn.classList.add("selected");
+          downBtn.classList.remove("selected");
+        });
+
+        downBtn.addEventListener("click", function() {
+          saveFeedback(feedbackKey, "down");
+          downBtn.classList.add("selected");
+          upBtn.classList.remove("selected");
+        });
+
+        feedbackRow.appendChild(upBtn);
+        feedbackRow.appendChild(downBtn);
+
+        chat.appendChild(feedbackRow);
+
+      }
+
     }
   );
+
 
 
   chat.scrollTop =
@@ -2252,9 +2330,37 @@ typewriterReveal(aiMessage, aiReply, function() {
   }
 
 
+ 
+  /* =========================
+     FEEDBACK STORAGE
+  ========================== */
+
+  const FEEDBACK_KEY = "codingAI_feedback";
+
+  function getFeedbackMap() {
+    try {
+      const data = localStorage.getItem(FEEDBACK_KEY);
+      return data ? JSON.parse(data) : {};
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function saveFeedback(key, value) {
+    try {
+      const map = getFeedbackMap();
+      map[key] = value;
+      localStorage.setItem(FEEDBACK_KEY, JSON.stringify(map));
+    } catch (error) {
+      console.error("Feedback save error:", error);
+    }
+  }
+
+
   /* =========================
      STARTUP
   ========================== */
+
 
 
   purgeOldDeletedChats();

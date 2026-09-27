@@ -936,9 +936,10 @@ const response = await fetch(
       body: JSON.stringify({
   model: "openai/gpt-oss-20b",
 
-  max_tokens: 1500,
+   max_tokens: 3000,
 
   reasoning_effort: "high",
+
 
   messages: [
 

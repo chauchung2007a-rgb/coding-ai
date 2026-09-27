@@ -80,6 +80,69 @@ const languageDetection = detectLanguage(message);
 
 let languageKnowledgeBlock = "";
 
+// =========================================
+// WEB SEARCH (Tavily) — only when relevant
+// =========================================
+
+const webSearchKeywords = [
+  "ស្វែងរក",
+  "ព័ត៌មានចុងក្រោយ",
+  "ថ្មីៗនេះ",
+  "ឥឡូវនេះ",
+  "search",
+  "latest",
+  "current",
+  "today",
+  "news",
+  "what is the latest"
+];
+
+const wantsWebSearch =
+  webSearchKeywords.some(keyword =>
+    message.toLowerCase().includes(keyword.toLowerCase())
+  );
+
+let webSearchContext = "";
+
+if (wantsWebSearch && process.env.TAVILY_API_KEY) {
+
+  try {
+
+    const searchResponse = await fetch(
+      "https://api.tavily.com/search",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          api_key: process.env.TAVILY_API_KEY,
+          query: message,
+          max_results: 3
+        })
+      }
+    );
+
+    if (searchResponse.ok) {
+
+      const searchData = await searchResponse.json();
+
+      const results = searchData.results || [];
+
+      webSearchContext = results
+        .map(r =>
+          `SOURCE: ${r.url}\nTITLE: ${r.title}\n${r.content}`
+        )
+        .join("\n\n")
+        .slice(0, 4000);
+
+    }
+
+  } catch (error) {
+    console.error("Tavily search error:", error);
+  }
+
+}
+
+
 if (
   languageDetection.language &&
   (
@@ -826,15 +889,21 @@ ${userName ? `The user's name is "${userName}". Address them by this name natura
 
 ### PAST CHAT HISTORY CONTEXT
 
-
 If the section below is not empty, it contains messages from the user's other past conversations, provided because the user's current message seems to reference something from before. Use it to answer accurately. If it is empty, the user did not reference past chats, so ignore this section entirely.
 
 ${pastChatsContext}
+
+### WEB SEARCH RESULTS
+
+If the section below is not empty, it contains fresh results from a live web search, because the user's message seems to need current information from the internet. Use it to answer accurately, and mention the source URL when you use a fact from it. If it is empty, no web search was needed, so ignore this section entirely.
+
+${webSearchContext}
 ${languageKnowledgeBlock}
 
 ${projectContext}
 
 `;
+
 
 
 

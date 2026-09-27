@@ -1955,13 +1955,18 @@ if (remainingText) {
      SEND MESSAGE
   ========================== */
 
-  async function sendMessage() {
+   async function sendMessage() {
 
-    const message =
+    let message =
       messageInput.value.trim();
 
 
-    if (!message) return;
+    if (!message && !selectedImageBase64) return;
+
+    if (!message && selectedImageBase64) {
+      message = "សូមមើលរូបភាពនេះ ហើយពិពណ៌នា ឬឆ្លើយសំណួរអំពីវា។";
+    }
+
 
 
     /* =========================

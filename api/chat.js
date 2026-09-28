@@ -972,7 +972,8 @@ const response = await fetch(
           body: JSON.stringify({
     model: imageBase64
     ? "qwen/qwen3.8-27b"
-    : "openai/gpt-oss-20b",
+       : "openai/gpt-oss-120b",
+
 
 
 

@@ -862,6 +862,9 @@
 
         <button type="button" id="settingsFeedbackBtn" class="settings-save-btn" style="background:#eee; color:#111; margin-top:8px;">មើលមតិយោបល់ 👎</button>
 
+        <button type="button" id="settingsExportBtn" class="settings-save-btn" style="background:#eee; color:#111; margin-top:8px;">ទាញយកទិន្នន័យ 👍</button>
+
+
       </div>
 
     </div>
@@ -2589,9 +2592,69 @@ typewriterReveal(aiMessage, aiReply, function() {
   });
 
 
+   /* =========================
+     EXPORT 👍 DATA (JSONL)
+  ========================== */
+
+  document
+    .getElementById("settingsExportBtn")
+    .addEventListener("click", function() {
+
+      const feedbackMap = getFeedbackMap();
+      const lines = [];
+
+      getChats().forEach(function(chatItem) {
+
+        const messages = chatItem.messages || [];
+
+        messages.forEach(function(message, index) {
+
+          if (message.role === "user") return;
+
+          const key =
+            chatItem.id + "_" + (message.timestamp || "");
+
+          if (feedbackMap[key] !== "up") return;
+
+          const prev = messages[index - 1];
+
+          if (!prev || prev.role !== "user") return;
+
+          lines.push(JSON.stringify({
+            messages: [
+              { role: "user", content: prev.text },
+              { role: "assistant", content: message.text }
+            ]
+          }));
+
+        });
+
+      });
+
+      if (lines.length === 0) {
+        alert("មិនទាន់មានចម្លើយ 👍 ទេ។");
+        return;
+      }
+
+      const blob = new Blob(
+        [lines.join("\n")],
+        { type: "application/json" }
+      );
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "coding-ai-good-answers.jsonl";
+      link.click();
+
+      alert("បានទាញយក " + lines.length + " គូសំណួរ-ចម្លើយ។");
+
+    });
+
+
   /* =========================
      STARTUP
   ========================== */
+
 
 
 
